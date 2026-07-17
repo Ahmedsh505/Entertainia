@@ -1,0 +1,29 @@
+# Visual Studio / .NET
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.cache
+msbuild.binlog
+
+# Publish profiles (contain deployment credentials)
+**/PublishProfiles/
+
+# Local artifacts
+*.rar
+project-structure.txt
+
+# EF / local DB artifacts
+*.mdf
+*.ldf
+*.bak
+
+# User uploads (runtime content)
+Entertania1/wwwroot/uploads/
+
+# OS / editor noise
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
