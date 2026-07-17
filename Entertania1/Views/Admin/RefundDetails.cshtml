@@ -1,0 +1,113 @@
+﻿@model Core.Models.PaymentModels.Refund
+
+@{
+    ViewData["Title"] = "Refund Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/Admin/RefundDetails.css" />
+
+<div class="container mt-4">
+    <h2 class="mb-3">Refund Details</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <dl class="row">
+
+                <dt class="col-sm-3">Refund ID</dt>
+                <dd class="col-sm-9">@Model.RefundId</dd>
+
+                <dt class="col-sm-3">Payment ID</dt>
+                <dd class="col-sm-9">@Model.PaymentId</dd>
+
+                <dt class="col-sm-3">Booking ID</dt>
+                <dd class="col-sm-9">@Model.BookingId</dd>
+
+                <dt class="col-sm-3">Requested By</dt>
+                <dd class="col-sm-9">
+                    @(Model.RequestedBy != null
+                                        ? $"{Model.RequestedBy.FirstName} {Model.RequestedBy.LastName}"
+                                        : "N/A")
+                </dd>
+
+                @if (Model.ProcessedBy != null)
+                {
+                    <dt class="col-sm-3">Processed By</dt>
+                    <dd class="col-sm-9">@Model.ProcessedBy.FirstName @Model.ProcessedBy.LastName</dd>
+                }
+
+                <dt class="col-sm-3">Original Amount</dt>
+                <dd class="col-sm-9">@Model.OriginalAmount @Model.Currency</dd>
+
+                <dt class="col-sm-3">Refund %</dt>
+                <dd class="col-sm-9">@Model.RefundPercentage %</dd>
+
+                <dt class="col-sm-3">Refund Amount</dt>
+                <dd class="col-sm-9">@Model.RefundAmount @Model.Currency</dd>
+
+                <dt class="col-sm-3">Reason</dt>
+                <dd class="col-sm-9">@Model.Reason</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    <span class="@Model.GetStatusBadgeClass()">
+                        @Model.GetStatusText()
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Requested At</dt>
+                <dd class="col-sm-9">@Model.RequestedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                @if (Model.ProcessedAt != null)
+                {
+                    <dt class="col-sm-3">Processed At</dt>
+                    <dd class="col-sm-9">@Model.ProcessedAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+                }
+
+                @if (Model.CompletedAt != null)
+                {
+                    <dt class="col-sm-3">Completed At</dt>
+                    <dd class="col-sm-9">@Model.CompletedAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+                }
+
+                @if (Model.FailedAt != null)
+                {
+                    <dt class="col-sm-3">Failed At</dt>
+                    <dd class="col-sm-9">@Model.FailedAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                    @if (!string.IsNullOrEmpty(Model.FailureReason))
+                    {
+                        <dt class="col-sm-3">Failure Reason</dt>
+                        <dd class="col-sm-9">@Model.FailureReason</dd>
+                    }
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.AdminNotes))
+                {
+                    <dt class="col-sm-3">Admin Notes</dt>
+                    <dd class="col-sm-9">@Model.AdminNotes</dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.RefundTransactionId))
+                {
+                    <dt class="col-sm-3">Gateway Transaction</dt>
+                    <dd class="col-sm-9">@Model.RefundTransactionId</dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.PaymentGatewayReference))
+                {
+                    <dt class="col-sm-3">Gateway Reference</dt>
+                    <dd class="col-sm-9">@Model.PaymentGatewayReference</dd>
+                }
+
+            </dl>
+
+            <div class="mt-4">
+                <a href="@Url.Action("RefundRequests", "Admin")" class="btn btn-secondary">
+                    Back to List
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

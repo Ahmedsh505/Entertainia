@@ -1,0 +1,292 @@
+﻿@model Entertania1.ViewModels.Venue.VenueCreateViewModel
+@inject IConfiguration Configuration
+@using Core.Enums
+@using Core.Helpers
+
+@{
+    ViewData["Title"] = "Edit Venue";
+    var governorates = GovernorateHelper.GetGovernorateList(includeArabic: true);
+}
+
+<link rel="stylesheet" href="~/css/Venue/VenueEdit.css" />
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h3><i class="fas fa-edit"></i> Edit Venue</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data" id="venueForm">
+                        <input type="hidden" asp-for="VenueId" />
+                        <input type="hidden" asp-for="GoogleMapsUrl" id="googleMapsUrl" />
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Venue Name</label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g., Cairo Opera House" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Governorate Dropdown with Validation -->
+                        <div class="mb-3">
+                            <label asp-for="Governorate" class="form-label">
+                                <i class="fas fa-map-marked-alt"></i> Governorate / المحافظة
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Governorate"
+                                    class="form-select select2-governorate"
+                                    id="governorateSelect"
+                                    required>
+                                <option value="">-- Select Governorate --</option>
+                                @foreach (var gov in governorates)
+                                {
+                                    <option value="@gov.Key" selected="@(gov.Key == (int)Model.Governorate)">
+                                        @gov.Value
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="Governorate" class="text-danger"></span>
+                            <div id="governorateValidation" class="mt-2" style="display: none;">
+                                <div class="alert alert-warning alert-sm mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span id="validationMessage"></span>
+                                </div>
+                            </div>
+                            <small class="text-success" id="autoDetectSuccess" style="display: none;">
+                                <i class="fas fa-check-circle"></i> Auto-detected from map location
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label">Address</label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g., 1 Opera Square, Gezira" />
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Capacity" class="form-label">Capacity</label>
+                            <input asp-for="Capacity" class="form-control" type="number" min="1" placeholder="e.g., 1000" />
+                            <span asp-validation-for="Capacity" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="mb-3 position-relative">
+                            <label class="form-label">
+                                <i class="fas fa-search"></i> Search for Location
+                            </label>
+                            <div class="input-group">
+                                <input type="text" id="placeSearch" class="form-control" placeholder="Type venue name or address...">
+                                <button type="button" id="useMyLocation" class="btn btn-outline-primary" onclick="useMyLocation()">
+                                    <i class="fas fa-location-arrow"></i> Use my location
+                                </button>
+                            </div>
+                            <div id="searchResults" class="list-group position-absolute w-100 shadow-sm" style="z-index:1000; display:none;"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <input asp-for="Latitude"
+                                       class="form-control"
+                                       id="latitudeInput"
+                                       placeholder="e.g., 30.0444"
+                                       step="0.000001"
+                                       type="hidden" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <input asp-for="Longitude"
+                                       class="form-control"
+                                       id="longitudeInput"
+                                       placeholder="e.g., 31.2357"
+                                       step="0.000001"
+                                       type="hidden" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Select Location on Map
+                                <span class="text-muted">(Click to place marker)</span>
+                            </label>
+                            <div id="map" style="height: 450px; border-radius: 8px; border: 2px solid #dee2e6;"></div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                Click anywhere on the map to set venue location. Governorate will be auto-detected instantly.
+                                <button type="button" class="btn btn-sm btn-link" onclick="centerMapToEgypt()">
+                                    Reset to Cairo
+                                </button>
+                            </small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- EXISTING MEDIA SECTION -->
+                        @{
+                            var photos = ViewBag.Photos as List<Core.Models.PhotoModels.VenuePhoto> ?? new List<Core.Models.PhotoModels.VenuePhoto>();
+                            var videos = ViewBag.Videos as List<Core.Models.VideoModels.VenueVideo> ?? new List<Core.Models.VideoModels.VenueVideo>();
+                            var totalMedia = photos.Count + videos.Count;
+                        }
+
+                        @if (totalMedia > 0)
+                        {
+                            <div class="card mb-3">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5><i class="fas fa-photo-video"></i> Current Media (@photos.Count Photos, @videos.Count Videos / 10 Max Photos, 5 Max Videos)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3" id="currentMediaGrid">
+                                        @foreach (var photo in photos)
+                                        {
+                                            <div class="col-md-3" data-photo-id="@photo.VenuePhotoId">
+                                                <div class="photo-management-item">
+                                                    <img src="@photo.FilePath" class="img-fluid rounded" alt="Venue Photo" />
+
+                                                    <div class="photo-overlay">
+                                                        @if (photo.IsPrimary)
+                                                        {
+                                                            <span class="badge bg-success primary-badge">
+                                                                <i class="fas fa-star"></i> Cover
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="button" class="btn btn-sm btn-success mb-2"
+                                                                    onclick="setPrimary(@Model.VenueId, @photo.VenuePhotoId)">
+                                                                <i class="fas fa-star"></i> Set as Cover
+                                                            </button>
+                                                        }
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                                onclick="deletePhoto(@photo.VenuePhotoId)">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+
+                                                    <small class="d-block text-muted mt-2 text-center">
+                                                        @if (!string.IsNullOrEmpty(photo.OriginalFileName))
+                                                        {
+                                                            @photo.OriginalFileName
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>Photo @photo.DisplayOrder</text>
+                                                        }
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @foreach (var video in videos)
+                                        {
+                                            <div class="col-md-3" data-video-id="@video.VenueVideoId">
+                                                <div class="photo-management-item video-item">
+                                                    <video class="img-fluid rounded" preload="metadata">
+                                                        <source src="@video.FilePath" type="@video.ContentType">
+                                                    </video>
+                                                    <div class="video-indicator">
+                                                        <i class="fas fa-play-circle"></i>
+                                                    </div>
+
+                                                    <div class="photo-overlay">
+                                                        @if (video.IsPrimary)
+                                                        {
+                                                            <span class="badge bg-success primary-badge">
+                                                                <i class="fas fa-star"></i> Featured
+                                                            </span>
+                                                        }
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                                onclick="deleteVideo(@video.VenueVideoId)">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+
+                                                    <small class="d-block text-muted mt-2 text-center">
+                                                        @if (!string.IsNullOrEmpty(video.OriginalFileName))
+                                                        {
+                                                            @video.OriginalFileName
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>Video @video.DisplayOrder</text>
+                                                        }
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- ADD MORE MEDIA SECTION -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                <h5><i class="fas fa-plus-circle"></i> Add More Media</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Media Guidelines:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>Photos: Maximum 10 total (Currently: @photos.Count - Can add: @(10 - photos.Count))</li>
+                                        <li>Videos: Maximum 5 total (Currently: @videos.Count - Can add: @(5 - videos.Count))</li>
+                                        <li>Photo size: Up to 20 MB each</li>
+                                        <li>Video size: Up to 250 MB each</li>
+                                    </ul>
+                                </div>
+
+                                @if (photos.Count < 10)
+                                {
+                                    <div class="mb-3">
+                                        <label for="photoInput" class="form-label">
+                                            <i class="fas fa-images"></i> Add Photos
+                                        </label>
+                                        <input type="file" name="photos" id="photoInput"
+                                               accept="image/jpeg,image/png,image/webp,image/gif,image/bmp"
+                                               multiple class="form-control" />
+                                    </div>
+                                    <div id="photoPreview" class="row g-3 mt-2" style="display: none;"></div>
+                                }
+
+                                @if (videos.Count < 5)
+                                {
+                                    <div class="mb-3 mt-4">
+                                        <label for="videoInput" class="form-label">
+                                            <i class="fas fa-video"></i> Add Videos
+                                        </label>
+                                        <input type="file" name="videos" id="videoInput"
+                                               accept="video/mp4,video/webm,video/quicktime,video/x-matroska,video/x-msvideo"
+                                               multiple class="form-control" />
+                                    </div>
+                                    <div id="videoPreview" class="row g-3 mt-2" style="display: none;"></div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                                <i class="fas fa-save"></i> Update Venue
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script src="~/js/VenueEdit.js"></script>
+}

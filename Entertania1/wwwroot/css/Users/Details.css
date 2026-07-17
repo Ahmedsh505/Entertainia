@@ -1,0 +1,107 @@
+﻿/* ===========================================
+   USER DETAILS – LIGHT GOLD EGYPTIAN THEME
+   =========================================== */
+
+/* ---------- ROOT COLORS ---------- */
+:root {
+    --egypt-gold: #D4AF37;
+    --egypt-blue: #0A3D62;
+    --off-white: #F8F5EF;
+    --dark-text: #1A1A1A;
+    --muted: #6f6f6f;
+    --soft-gray: #E6E1D6;
+    --gold-shadow: rgba(212, 175, 55, 0.16);
+}
+
+/* ---------- PAGE ---------- */
+.user-details-page {
+    padding: 30px 0;
+    font-family: 'Cairo', 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: var(--dark-text);
+    background: var(--off-white);
+}
+
+    /* ---------- HEADER ---------- */
+    .user-details-page h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--egypt-blue);
+        margin-bottom: 12px;
+    }
+
+    .user-details-page h4 {
+        color: var(--muted);
+        margin-bottom: 20px;
+    }
+
+/* ---------- DETAILS CARD ---------- */
+dl.row {
+    background: #fff;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(10,20,40,0.08);
+    border-left: 5px solid var(--egypt-gold);
+}
+
+dt {
+    font-weight: 700;
+    color: var(--egypt-blue);
+    margin-bottom: 8px;
+}
+
+dd {
+    margin-bottom: 16px;
+}
+
+.form-control-plaintext {
+    background: #fdf9f3;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--soft-gray);
+    color: var(--dark-text);
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--egypt-gold);
+    color: #fff;
+    border: 2px solid var(--egypt-gold);
+    box-shadow: 0 6px 18px var(--gold-shadow);
+}
+
+    .btn-primary:hover {
+        background-color: var(--egypt-blue);
+        color: #fff;
+        border-color: var(--egypt-gold);
+        transform: translateY(-2px);
+    }
+
+.btn-secondary {
+    background-color: #fff;
+    color: var(--egypt-blue);
+    border: 2px solid var(--egypt-blue);
+}
+
+    .btn-secondary:hover {
+        background-color: var(--egypt-blue);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 576px) {
+    dl.row {
+        padding: 18px;
+    }
+
+    .form-control-plaintext {
+        font-size: 0.9rem;
+    }
+}

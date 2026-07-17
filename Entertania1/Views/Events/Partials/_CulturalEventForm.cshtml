@@ -1,0 +1,21 @@
+﻿@using Core.Models.EventModels
+@model CulturalEvent
+
+<div id="culturaleventfields" class="category-section">
+    <h4>🏛️ Cultural Event Details</h4>
+
+    <div class="form-group">
+        <label asp-for="OrganizerName"></label>
+        <input asp-for="OrganizerName" class="form-control" name="CulturalEvent.OrganizerName" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Topic"></label>
+        <input asp-for="Topic" class="form-control" name="CulturalEvent.Topic" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Language"></label>
+        <input asp-for="Language" class="form-control" name="CulturalEvent.Language" />
+    </div>
+</div>

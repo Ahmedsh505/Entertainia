@@ -1,0 +1,528 @@
+﻿@model Entertania1.ViewModels.Event.EventCreateVM
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Events/EventCreate.css" />
+}
+
+<div class="container mt-4">
+    <h2><i class="fas fa-calendar-plus"></i> Create Event</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="eventForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Basic Information Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-info-circle"></i> Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Event Title -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Event.Title" class="form-label fw-bold">Event Title</label>
+                            <input asp-for="Event.Title" class="form-control" placeholder="Enter event title" />
+                            <span asp-validation-for="Event.Title" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Event.Description" class="form-label fw-bold">Description</label>
+                            <textarea asp-for="Event.Description" class="form-control" rows="4" placeholder="Enter event description"></textarea>
+                            <span asp-validation-for="Event.Description" class="text-danger"></span>
+                        </div>
+
+                        @if (User.IsInRole("Organizer"))
+                        {
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> You will be automatically assigned as the organizer of this event.
+                            </div>
+                        }
+
+                        <!-- Venue -->
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Venue</label>
+                            <select asp-for="Event.VenueId" asp-items="@(new SelectList(Model.Venues, "VenueId", "Name"))" class="form-control">
+                                <option value="">-- Select Venue --</option>
+                            </select>
+                            <span asp-validation-for="Event.VenueId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Date & Time -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Event.StartDate" class="form-label fw-bold">Start Date</label>
+                                <input asp-for="Event.StartDate" class="form-control" type="datetime-local" step="60" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="Event.StartDate" class="text-danger"></span>
+                                <small class="text-muted">Select a future date and time</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Event.EndDate" class="form-label fw-bold">End Date</label>
+                                <input asp-for="Event.EndDate" class="form-control" type="datetime-local" step="60" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="Event.EndDate" class="text-danger"></span>
+                                <small class="text-muted">Must be after start date</small>
+                            </div>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Event Price</label>
+                            <div class="input-group">
+                                <input asp-for="Event.Price" class="form-control" type="number" step="0.01" min="0.01" placeholder="Enter price" />
+                                <select asp-for="Event.Currency" class="form-select" style="max-width: 120px;">
+                                    <option value="0">EGP</option>
+                                    <option value="1">USD</option>
+                                    <option value="2">EUR</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="Event.Price" class="text-danger"></span>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Category</label>
+                            <select id="categorySelect" asp-for="Event.Category" class="form-control">
+                                <option value="">-- Select Category --</option>
+                                <option value="Concert">Concert</option>
+                                <option value="SportEvent">Sport Event</option>
+                                <option value="TheaterPlay">Theater Play</option>
+                                <option value="CulturalEvent">Cultural Event</option>
+                                <option value="TourismActivity">Tourism Activity</option>
+                            </select>
+                            <span asp-validation-for="Event.Category" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-Event Container (dynamically loaded based on category) -->
+                <div id="subEventContainer"></div>
+
+                <!-- Event Media Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-photo-video"></i> Event Media</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Photos Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-images"></i> Photos</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Upload up to 10 photos. First photo will be the cover photo.
+                            </div>
+
+                            <input type="file"
+                                   name="photos"
+                                   id="photoInput"
+                                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp"
+                                   multiple
+                                   class="form-control" />
+
+                            <small class="text-muted">
+                                Supported formats: JPG, PNG, WEBP, GIF, BMP (Max 20 MB each)
+                            </small>
+                        </div>
+
+                        <!-- Videos Section -->
+                        <div>
+                            <h6 class="fw-bold mb-3"><i class="fas fa-video"></i> Videos</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Upload up to 5 videos to showcase your event.
+                            </div>
+
+                            <input type="file"
+                                   name="videos"
+                                   id="videoInput"
+                                   accept="video/mp4,video/webm,video/mov,video/mkv,video/avi"
+                                   multiple
+                                   class="form-control" />
+
+                            <small class="text-muted">
+                                Supported formats: MP4, WEBM, MOV, MKV, AVI (Max 250 MB each)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discount Codes Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-tag"></i> Discount Codes (Optional)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="discountCodesContainer"></div>
+
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="addDiscountCode()">
+                            <i class="fas fa-plus"></i> Add Discount Code
+                        </button>
+
+                        <div class="alert alert-info mt-3">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Discount Types:</strong>
+                                <ul class="mb-0">
+                                    <li><strong>Percentage:</strong> Enter value like 20 for 20% off</li>
+                                    <li><strong>Fixed Amount:</strong> Enter value like 50 for 50 EGP/USD/EUR off</li>
+                                </ul>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Create Event
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        console.log("Script loaded successfully");
+
+        let discountCodeIndex = 0;
+
+        // Category form loading
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("categorySelect");
+            const subContainer = document.getElementById("subEventContainer");
+
+            categorySelect.addEventListener("change", function () {
+                const category = this.value;
+
+                if (!category) {
+                    subContainer.innerHTML = "";
+                    return;
+                }
+
+                // Load partial view based on category
+                fetch(`/Events/LoadCategoryForm?category=${category}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        subContainer.innerHTML = html;
+                    })
+                    .catch(err => {
+                        console.error('Error loading form:', err);
+                        subContainer.innerHTML = "<p class='text-danger'>Error loading form</p>";
+                    });
+            });
+        });
+
+        // Discount code functions
+        function addDiscountCode() {
+            const container = document.getElementById('discountCodesContainer');
+            const newCode = `
+                <div class="discount-code-item border p-3 mb-3 rounded">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label">Code <span class="text-danger">*</span></label>
+                            <input name="DiscountCodes[${discountCodeIndex}].Code"
+                                   class="form-control"
+                                   placeholder="SAVE20"
+                                   required />
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Type</label>
+                            <select name="DiscountCodes[${discountCodeIndex}].DiscountType" class="form-control">
+                                <option value="0">Percentage</option>
+                                <option value="1">Fixed Amount</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Value <span class="text-danger">*</span></label>
+                            <input name="DiscountCodes[${discountCodeIndex}].DiscountValue"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.01"
+                                   min="0.01"
+                                   placeholder="20"
+                                   required />
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Valid From</label>
+                            <input name="DiscountCodes[${discountCodeIndex}].ValidFrom"
+                                   class="form-control"
+                                   type="datetime-local" />
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Valid Until</label>
+                            <input name="DiscountCodes[${discountCodeIndex}].ValidUntil"
+                                   class="form-control"
+                                   type="datetime-local" />
+                        </div>
+                        <div class="col-md-1 mb-2 d-flex align-items-end">
+                            <button type="button"
+                                    class="btn btn-danger btn-sm w-100"
+                                    onclick="removeDiscountCode(this)"
+                                    title="Remove">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label">Max Usage</label>
+                            <input name="DiscountCodes[${discountCodeIndex}].MaxUsageCount"
+                                   class="form-control"
+                                   type="number"
+                                   min="1"
+                                   placeholder="Unlimited" />
+                            <small class="text-muted">Leave blank for unlimited</small>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <div class="form-check mt-4">
+                                <input name="DiscountCodes[${discountCodeIndex}].IsActive"
+                                       class="form-check-input"
+                                       type="checkbox"
+                                       value="true"
+                                       checked
+                                       id="discount_active_${discountCodeIndex}" />
+                                <label class="form-check-label" for="discount_active_${discountCodeIndex}">
+                                    Is Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', newCode);
+            discountCodeIndex++;
+        }
+
+        function removeDiscountCode(button) {
+            if (confirm('Are you sure you want to remove this discount code?')) {
+                button.closest('.discount-code-item').remove();
+            }
+        }
+    </script>
+
+    <!-- Venue Availability Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const venueSelect = document.querySelector('[name="Event.VenueId"]');
+            const startInput = document.querySelector('[name="Event.StartDate"]');
+            const endInput = document.querySelector('[name="Event.EndDate"]');
+
+            let bookedSlots = [];
+
+            // Helper function to check if a date is within any booked slot
+            function isDateInBookedSlot(date) {
+                const checkTime = date.getTime();
+
+                return bookedSlots.some(slot => {
+                    const slotStart = new Date(slot.from).getTime();
+                    const slotEnd = new Date(slot.to).getTime();
+
+                    // Check if the date falls within the booked range (inclusive)
+                    return checkTime >= slotStart && checkTime <= slotEnd;
+                });
+            }
+
+            const startPicker = flatpickr(startInput, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                minDate: "today",
+                time_24hr: true,
+                minuteIncrement: 30,
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const date = dayElem.dateObj;
+
+                    if (isDateInBookedSlot(date)) {
+                        dayElem.classList.add('booked-date');
+                        dayElem.title = 'This date has booked events';
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const selectedDate = selectedDates[0];
+
+                        // Check if selected datetime is in a booked slot
+                        if (isDateInBookedSlot(selectedDate)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Unavailable',
+                                text: 'This venue is already booked at the selected time. Please choose a different date/time.',
+                                confirmButtonColor: '#d33'
+                            });
+                            instance.clear();
+                            return;
+                        }
+
+                        // Update end date picker minimum
+                        if (endPicker) {
+                            endPicker.set('minDate', selectedDate);
+                        }
+                    }
+                }
+            });
+
+            const endPicker = flatpickr(endInput, {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                minDate: "today",
+                time_24hr: true,
+                minuteIncrement: 30,
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const date = dayElem.dateObj;
+
+                    if (isDateInBookedSlot(date)) {
+                        dayElem.classList.add('booked-date');
+                        dayElem.title = 'This date has booked events';
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const selectedDate = selectedDates[0];
+
+                        // Check if selected datetime is in a booked slot
+                        if (isDateInBookedSlot(selectedDate)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Time Unavailable',
+                                text: 'This venue is already booked at the selected time. Please choose a different date/time.',
+                                confirmButtonColor: '#d33'
+                            });
+                            instance.clear();
+                            return;
+                        }
+
+                        // Validate that end date is after start date
+                        const startDate = startPicker.selectedDates[0];
+                        if (startDate && selectedDate <= startDate) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Invalid Date Range',
+                                text: 'End date must be after start date.',
+                                confirmButtonColor: '#f39c12'
+                            });
+                            instance.clear();
+                        }
+                    }
+                }
+            });
+
+            venueSelect.addEventListener("change", function () {
+                const venueId = this.value;
+
+                // Clear previous selections
+                startPicker.clear();
+                endPicker.clear();
+                bookedSlots = [];
+
+                if (!venueId) return;
+
+                fetch(`/Events/GetVenueAvailability?venueId=${venueId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        bookedSlots = data.map(ev => ({
+                            from: new Date(ev.start),
+                            to: new Date(ev.end)
+                        }));
+
+                        // Refresh the calendars to show booked dates
+                        startPicker.redraw();
+                        endPicker.redraw();
+
+                        if (bookedSlots.length > 0) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Venue Selected',
+                                html: `
+                                    <p>This venue has ${bookedSlots.length} booked event(s).</p>
+                                    <p class="text-muted small">Dates with existing bookings will be highlighted in red and cannot be selected.</p>
+                                `,
+                                confirmButtonColor: '#3085d6'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Venue Available',
+                                text: 'This venue is completely available. You can select any date.',
+                                confirmButtonColor: '#28a745',
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error fetching availability:", err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load venue availability. Please try again.',
+                            confirmButtonColor: '#d33'
+                        });
+                    });
+            });
+
+            // Form validation before submit
+            document.getElementById('eventForm').addEventListener('submit', function(e) {
+                const startDate = startPicker.selectedDates[0];
+                const endDate = endPicker.selectedDates[0];
+
+                if (startDate && isDateInBookedSlot(startDate)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Start Date',
+                        text: 'The selected start date/time conflicts with an existing booking.',
+                        confirmButtonColor: '#d33'
+                    });
+                    return false;
+                }
+
+                if (endDate && isDateInBookedSlot(endDate)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid End Date',
+                        text: 'The selected end date/time conflicts with an existing booking.',
+                        confirmButtonColor: '#d33'
+                    });
+                    return false;
+                }
+
+                // Check if the entire range conflicts with any booking
+                if (startDate && endDate) {
+                    const hasConflict = bookedSlots.some(slot => {
+                        const slotStart = new Date(slot.from).getTime();
+                        const slotEnd = new Date(slot.to).getTime();
+                        const eventStart = startDate.getTime();
+                        const eventEnd = endDate.getTime();
+
+                        // Check for any overlap
+                        return (eventStart <= slotEnd && eventEnd >= slotStart);
+                    });
+
+                    if (hasConflict) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Schedule Conflict',
+                            text: 'Your event time range overlaps with an existing booking. Please choose different dates.',
+                            confirmButtonColor: '#d33'
+                        });
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+}

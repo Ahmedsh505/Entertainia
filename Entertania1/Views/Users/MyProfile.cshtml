@@ -1,0 +1,230 @@
+﻿@model Core.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+    var initials = (!string.IsNullOrEmpty(Model.FirstName) ? Model.FirstName[0].ToString() : "") +
+                   (!string.IsNullOrEmpty(Model.LastName) ? Model.LastName[0].ToString() : "");
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/MyProfile.css" />
+}
+<div class="container mt-4">
+    <h1>My Profile</h1>
+    <h4 class="text-muted">View and manage your account information</h4>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Profile Picture Column -->
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="profile-picture-display mb-3">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+                        {
+                            <img src="@Model.ProfilePicturePath"
+                                 alt="@Model.FirstName @Model.LastName"
+                                 class="profile-picture-large rounded-circle" />
+                        }
+                        else
+                        {
+                            <div class="profile-picture-placeholder-large rounded-circle">
+                                <span class="initials-text-large">@initials.ToUpper()</span>
+                            </div>
+                        }
+                    </div>
+
+                    <h3 class="mb-1">@Model.FirstName @Model.LastName</h3>
+                    <p class="text-muted mb-3">@@@Model.UserName</p>
+
+                    <span class="badge @(Model.Role == "Admin" ? "bg-danger" : Model.Role == "Organizer" ? "bg-warning text-dark" : "bg-primary") mb-3">
+                        <i class="bi bi-@(Model.Role == "Admin" ? "shield-check" : Model.Role == "Organizer" ? "calendar-event" : "person")"></i>
+                        @Model.Role
+                    </span>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a asp-action="EditProfile" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Security Settings Card -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Security Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Two-Factor Authentication</h6>
+                            @if (Model.TwoFactorEnabled)
+                            {
+                                <p class="text-success">✅ Enabled</p>
+                                <form asp-controller="Account" asp-action="Disable2FA" method="post">
+                                    <button type="submit" class="btn btn-warning"
+                                            onclick="return confirm('Are you sure you want to disable 2FA?')">
+                                        Disable 2FA
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Not enabled</p>
+                                <a asp-controller="Account" asp-action="Enable2FA" class="btn btn-primary">
+                                    Enable 2FA
+                                </a>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Email Status</h6>
+                            @if (Model.EmailConfirmed)
+                            {
+                                <p class="text-success">✅ Email Confirmed</p>
+                            }
+                            else
+                            {
+                                <p class="text-warning">⚠️ Email Not Confirmed</p>
+                                <a asp-controller="Account" asp-action="ResendConfirmationEmail" class="btn btn-sm btn-primary">
+                                    Resend Confirmation
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Information Column -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Username:</dt>
+                        <dd class="col-sm-8">@Model.UserName</dd>
+
+                        <dt class="col-sm-4">Full Name:</dt>
+                        <dd class="col-sm-8">@Model.FirstName @Model.LastName</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4">Phone Number:</dt>
+                        <dd class="col-sm-8">@(Model.PhoneNumber ?? "Not provided")</dd>
+
+                        <dt class="col-sm-4">Address:</dt>
+                        <dd class="col-sm-8">@(Model.Address ?? "Not provided")</dd>
+
+                        <dt class="col-sm-4">Role:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-info">@Model.Role</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Account Status:</dt>
+                        <dd class="col-sm-8">
+                            @switch (Model.AccountStatus)
+                            {
+                                case Core.Enums.AccountStatus.Active:
+                                    <span class="badge bg-success">Active</span>
+                                    break;
+                                case Core.Enums.AccountStatus.PendingApproval:
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                    break;
+                                case Core.Enums.AccountStatus.Rejected:
+                                    <span class="badge bg-danger">Rejected</span>
+                                    break;
+                                case Core.Enums.AccountStatus.Disabled:
+                                    <span class="badge bg-secondary">Disabled</span>
+                                    break;
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Member Since:</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("MMMM dd, yyyy")</dd>
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <dt class="col-sm-4">Last Updated:</dt>
+                            <dd class="col-sm-8">@Model.UpdatedAt.Value.ToString("MMMM dd, yyyy")</dd>
+                        }
+                    </dl>
+
+                    <div class="mt-4">
+                        @if (Model.Role == "Organizer")
+                        {
+                            <a asp-controller="Users" asp-action="DeleteOrganizerAccount" class="btn btn-outline-danger">
+                                <i class="bi bi-person-x"></i> Delete My Account
+                            </a>
+                        }
+                        @if (Model.Role == "Customer")
+                        {
+                            <a asp-controller="Users" asp-action="DeleteCustomerAccount" class="btn btn-outline-danger">
+                                <i class="bi bi-person-x"></i> Delete My Account
+                            </a>
+                        }
+                        <a asp-action="ChangePassword" class="btn btn-warning">
+                            <i class="bi bi-key"></i> Change Password
+                        </a>                      
+                       
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-house"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Role == "Organizer")
+            {
+                <div class="card text-white mt-3">
+                    <div class="card-header">
+                        <h5>
+                            <i class="bi bi-calendar-event"></i> Organizer Portal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        <p>As an organizer, you can:</p>
+                        <ul>
+                            <li>Create and manage events</li>
+                            <li>Manage venues</li>
+                            <li>View bookings</li>
+                        </ul>
+                        <a asp-controller="Events" asp-action="Index" class="btn btn-primary">
+                            <i class="bi bi-calendar"></i> My Events
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Role == "Customer")
+            {
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>
+                            <i class="bi bi-ticket-perforated"></i> Customer Portal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Browse events and make bookings:</p>
+                        <a asp-controller="Events" asp-action="Index" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Browse Events
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

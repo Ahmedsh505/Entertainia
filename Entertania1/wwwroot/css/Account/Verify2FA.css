@@ -1,0 +1,131 @@
+﻿/* ============================
+   LIGHT EGYPTIAN THEME + GOLD
+   FULL 2FA PAGE STYLING
+   ============================ */
+
+:root {
+    --color-bg-elevated: #ffffff;
+    --color-text-primary: #0b2235; /* Dark Egyptian Blue (text) */
+    --color-text-secondary: #3b4f61; /* secondary text */
+    --color-accent-start: #C59D3B; /* Gold start */
+    --color-accent-end: #E0B95A; /* Gold end */
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --radius-md: 12px;
+    --radius-lg: 22px;
+    --shadow-glow: 0 0 12px rgba(241, 196, 15, 0.4);
+}
+
+/* ============================
+   AUTH CONTAINER
+   ============================ */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 15px;
+}
+
+/* ============================
+   CARD
+   ============================ */
+.auth-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: var(--radius-lg);
+    padding-bottom: 25px;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* ============================
+   HEADER
+   ============================ */
+.auth-header {
+    text-align: center;
+    background: var(--gradient-primary);
+    padding: 35px 22px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    color: #fff;
+}
+
+.auth-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.auth-title {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    margin-top: 5px;
+    font-size: 15px;
+    opacity: .9;
+}
+
+/* ============================
+   BODY
+   ============================ */
+.auth-body {
+    padding: 30px 35px;
+}
+
+    /* ============================
+   INPUT
+   ============================ */
+    .auth-body .form-label {
+        color: var(--color-text-primary);
+        font-weight: 600;
+    }
+
+    .auth-body input {
+        border: 2px solid #d4ac0d;
+        border-radius: var(--radius-md);
+        padding: 14px;
+        font-weight: bold;
+        font-size: 22px;
+        text-align: center;
+        letter-spacing: 10px !important;
+    }
+
+        .auth-body input:focus {
+            border-color: var(--color-accent-start);
+            box-shadow: var(--shadow-glow);
+        }
+
+/* ============================
+   BUTTON
+   ============================ */
+.btn-auth {
+    background: var(--gradient-primary);
+    border: none;
+    padding: 13px;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    color: #fff;
+    transition: .25s;
+    width: 100%;
+}
+
+    .btn-auth:hover {
+        opacity: .9;
+        transform: translateY(-1px);
+        color: var(--color-text-primary);
+    }
+
+/* ============================
+   FOOT NOTE
+   ============================ */
+.auth-body small {
+    color: var(--color-text-secondary);
+}
+
+/* Validation text */
+.text-danger {
+    font-size: 14px;
+    margin-top: 6px;
+    display: block;
+}

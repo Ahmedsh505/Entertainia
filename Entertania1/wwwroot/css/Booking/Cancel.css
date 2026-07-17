@@ -1,0 +1,46 @@
+﻿:root {
+    --gold: #C59D5F;
+    --gold-dark: #b38c4f;
+    --egyptian-blue: #0B3A6A;
+    --offwhite: #f9f7f3;
+}
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.card-header.bg-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.card-header.bg-info {
+    background-color: var(--egyptian-blue);
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #212529;
+}
+
+.alert-warning {
+    background-color: var(--gold);
+    color: #212529;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}

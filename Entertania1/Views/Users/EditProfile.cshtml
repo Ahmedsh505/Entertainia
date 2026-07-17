@@ -1,0 +1,389 @@
+﻿@model Entertania1.ViewModels.User.EditProfileVM
+
+@{
+    ViewData["Title"] = "Edit My Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/EditProfile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+}
+
+<div class="container mt-4 edit-profile-container">
+    <div class="page-header mb-4">
+        <h1><i class="bi bi-person-gear me-2"></i>Edit My Profile</h1>
+        <h4 class="text-muted">Update your personal information</h4>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card profile-card">
+                <div class="card-body">
+                    <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Profile Picture Section -->
+                        <div class="profile-picture-section">
+                            <label class="form-label fw-bold mb-3">Profile Picture</label>
+
+                            <div class="profile-picture-wrapper" id="profilePictureContainer">
+                                @if (!string.IsNullOrEmpty(Model.CurrentProfilePicturePath))
+                                {
+                                    <img src="@Model.CurrentProfilePicturePath"
+                                         alt="Profile Picture"
+                                         id="profilePicturePreview" />
+                                }
+                                else
+                                {
+                                    <div class="profile-initials-placeholder" id="profilePicturePlaceholder">
+                                        <span>
+                                            @((!string.IsNullOrEmpty(Model.FirstName) ? Model.FirstName[0].ToString() : "") +
+                                                                                    (!string.IsNullOrEmpty(Model.LastName) ? Model.LastName[0].ToString() : ""))
+                                    </span>
+                                </div>
+                                                                }
+                            </div>
+
+                            <div class="profile-actions">
+                                <input type="file"
+                                       asp-for="ProfilePicture"
+                                       class="form-control d-none"
+                                       id="profilePictureInput"
+                                       accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" />
+
+                                <button type="button" class="btn btn-primary" onclick="document.getElementById('profilePictureInput').click()">
+                                    <i class="bi bi-camera-fill"></i> Choose Picture
+                                </button>
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentProfilePicturePath))
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="removeProfilePicture()">
+                                        <i class="bi bi-trash-fill"></i> Remove
+                                    </button>
+                                }
+                            </div>
+                            <small class="file-hint">JPG, PNG, WEBP or GIF • Max 10MB</small>
+                            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                        </div>
+
+                        <hr class="section-divider" />
+
+                        <!-- Name Fields -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" class="form-control" type="email" placeholder="your@email.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="+1 (555) 000-0000" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="2" placeholder="Enter your address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> Save Changes
+                            </button>
+                            <a asp-action="ChangePassword" class="btn btn-warning">
+                                <i class="bi bi-key-fill"></i> Change Password
+                            </a>
+                            <a asp-action="MyProfile" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Profile
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Hidden form for removing profile picture -->
+                    <form id="removeProfilePictureForm" asp-action="RemoveProfilePicture" method="post" style="display: none;">
+                        @Html.AntiForgeryToken()
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card security-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-shield-check"></i> Profile Security
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="bi bi-lock-fill text-success"></i> Your data is encrypted</li>
+                        <li><i class="bi bi-eye-slash-fill text-info"></i> Only you see your full profile</li>
+                        <li><i class="bi bi-key-fill text-warning"></i> Change password regularly</li>
+                        <li><i class="bi bi-image-fill text-primary"></i> Profile picture is optional</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Cropper Modal -->
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content cropper-modal-content">
+            <div class="modal-header cropper-modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">
+                    <i class="bi bi-crop"></i> Crop Your Profile Picture
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body cropper-modal-body">
+                <!-- Cropper Container -->
+                <div class="cropper-container-wrapper">
+                    <img id="cropperImage" style="max-width: 100%; display: block;" />
+                </div>
+
+                <!-- Crop Controls -->
+                <div class="crop-controls">
+                    <button type="button" class="crop-btn-secondary" id="zoomInBtn" title="Zoom In">
+                        <i class="bi bi-zoom-in"></i>
+                    </button>
+                    <button type="button" class="crop-btn-secondary" id="zoomOutBtn" title="Zoom Out">
+                        <i class="bi bi-zoom-out"></i>
+                    </button>
+                    <button type="button" class="crop-btn-secondary" id="rotateLeftBtn" title="Rotate Left">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                    <button type="button" class="crop-btn-secondary" id="rotateRightBtn" title="Rotate Right">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button type="button" class="crop-btn-secondary" id="resetBtn" title="Reset">
+                        <i class="bi bi-arrow-repeat"></i> Reset
+                    </button>
+                </div>
+
+                <!-- Live Preview -->
+                <div class="crop-preview-container">
+                    <span class="crop-preview-label">Preview</span>
+                    <div class="crop-preview-box">
+                        <canvas id="cropPreview"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer cropper-modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="cropAndUseBtn">
+                    <i class="bi bi-check-circle"></i> Crop & Use
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+        let cropper;
+        let currentFile;
+
+        // File input change event
+        document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a valid image file (JPG, PNG, WEBP, or GIF)');
+                    e.target.value = '';
+                    return;
+                }
+
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    alert('File size must be less than 10MB');
+                    e.target.value = '';
+                    return;
+                }
+
+                currentFile = file;
+                initializeCropper(file);
+            }
+        });
+
+        function initializeCropper(file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const image = document.getElementById('cropperImage');
+                image.src = e.target.result;
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('cropperModal'));
+                modal.show();
+
+                // Destroy existing cropper if any
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                // Initialize cropper after image loads
+                image.onload = function() {
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        dragMode: 'move',
+                        autoCropArea: 0.9,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: true,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: true,
+                        responsive: true,
+                        checkOrientation: true,
+                        minContainerWidth: 400,
+                        minContainerHeight: 400,
+                        crop: function() {
+                            updatePreview();
+                        }
+                    });
+                };
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function updatePreview() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 150,
+                height: 150,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            const preview = document.getElementById('cropPreview');
+            const ctx = preview.getContext('2d');
+            preview.width = 150;
+            preview.height = 150;
+
+            ctx.clearRect(0, 0, 150, 150);
+            ctx.drawImage(canvas, 0, 0, 150, 150);
+        }
+
+        // Zoom In
+        document.getElementById('zoomInBtn').addEventListener('click', function() {
+            if (cropper) cropper.zoom(0.1);
+        });
+
+        // Zoom Out
+        document.getElementById('zoomOutBtn').addEventListener('click', function() {
+            if (cropper) cropper.zoom(-0.1);
+        });
+
+        // Rotate Left
+        document.getElementById('rotateLeftBtn').addEventListener('click', function() {
+            if (cropper) cropper.rotate(-90);
+        });
+
+        // Rotate Right
+        document.getElementById('rotateRightBtn').addEventListener('click', function() {
+            if (cropper) cropper.rotate(90);
+        });
+
+        // Reset
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (cropper) cropper.reset();
+        });
+
+        // Crop and Use
+        document.getElementById('cropAndUseBtn').addEventListener('click', function() {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 500,
+                maxHeight: 500,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            canvas.toBlob(function(blob) {
+                if (!blob) {
+                    alert('Failed to crop image. Please try again.');
+                    return;
+                }
+
+                // Create a new file from the blob
+                const croppedFile = new File([blob], currentFile.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+
+                // Update the file input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+                document.getElementById('profilePictureInput').files = dataTransfer.files;
+
+                // Update preview on page
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const container = document.getElementById('profilePictureContainer');
+                    container.innerHTML = `<img id="profilePicturePreview" src="${e.target.result}" alt="Profile Picture" />`;
+                };
+                reader.readAsDataURL(blob);
+
+                // Hide modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('cropperModal'));
+                modal.hide();
+
+            }, 'image/jpeg', 0.9);
+        });
+
+        // Clean up when modal is hidden
+        document.getElementById('cropperModal').addEventListener('hidden.bs.modal', function() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+
+        // Remove profile picture function
+        function removeProfilePicture() {
+            if (confirm('Are you sure you want to remove your profile picture?')) {
+                document.getElementById('removeProfilePictureForm').submit();
+            }
+        }
+    </script>
+}

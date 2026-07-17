@@ -1,0 +1,21 @@
+﻿@using Core.Models.EventModels
+@model Concert
+
+<div id="concertfields" class="category-section">
+    <h4>🎵 Concert Details</h4>
+    <div class="form-group">
+        <label asp-for="ArtistName"></label>
+        <input asp-for="ArtistName" class="form-control" name="Concert.ArtistName" />
+        <span asp-validation-for="ArtistName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Genre"></label>
+        <input asp-for="Genre" class="form-control" name="Concert.Genre" />
+        <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BandCount"></label>
+        <input asp-for="BandCount" type="number" class="form-control" name="Concert.BandCount" />
+        <span asp-validation-for="BandCount" class="text-danger"></span>
+    </div>
+</div>

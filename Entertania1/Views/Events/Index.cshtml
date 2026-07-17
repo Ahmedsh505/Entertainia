@@ -1,0 +1,629 @@
+﻿@model IEnumerable<EventBase>
+@using System.Security.Claims
+@using Core.Enums
+@using Core.Models.EventModels
+
+@{
+    ViewData["Title"] = "All Events";
+    var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+    var isAdmin = userRole == "Admin";
+    var isOrganizer = userRole == "Organizer";
+    var isCustomer = userRole == "Customer";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Events/EventsIndex.css" />
+}
+
+<!-- Hero Section -->
+<section class="events-hero">
+    <div class="hero-gradient"></div>
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <i class="fas fa-calendar-star"></i>
+                Discover Amazing Events
+            </h1>
+            <p class="hero-subtitle">Experience unforgettable moments at the best events near you</p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Container -->
+<div class="events-container">
+
+    <!-- Filters & Actions Bar -->
+    <div class="filters-actions-bar">
+
+        <!-- Search Box -->
+        <div class="search-box">
+            <form asp-action="Index" method="get">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text"
+                           name="searchTerm"
+                           class="search-input"
+                           placeholder="Search events, venues, categories..."
+                           value="@(ViewBag.SearchTerm)" />
+                    <button type="submit" class="search-btn">
+                        <span>Search</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sort & Create Actions -->
+        <div class="actions-group">
+
+            <!-- Create Event Button (Organizer/Admin) -->
+            @if (isOrganizer || isAdmin)
+            {
+                <a asp-action="Create" class="btn-create-event">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Event</span>
+                </a>
+            }
+
+            <!-- Sort Dropdown -->
+            <div class="sort-dropdown">
+                <form asp-action="Index" method="get">
+                    <div class="sort-wrapper">
+                        <label class="sort-label">
+                            <i class="fas fa-sort-amount-down"></i>
+                            Sort by
+                        </label>
+                        <select name="sortOption" class="sort-select" onchange="this.form.submit()">
+                            <option value="">Default</option>
+                            <option value="TitleAsc" selected="@(ViewBag.SortOption == "TitleAsc")">Name: A→Z</option>
+                            <option value="TitleDesc" selected="@(ViewBag.SortOption == "TitleDesc")">Name: Z→A</option>
+                            <option value="PriceAsc" selected="@(ViewBag.SortOption == "PriceAsc")">Price: Low to High</option>
+                            <option value="PriceDesc" selected="@(ViewBag.SortOption == "PriceDesc")">Price: High to Low</option>
+                            <option value="StartDateAsc" selected="@(ViewBag.SortOption == "StartDateAsc")">Date: Oldest First</option>
+                            <option value="StartDateDesc" selected="@(ViewBag.SortOption == "StartDateDesc")">Date: Newest First</option>
+                            <option value="GovernorateAsc" selected="@(ViewBag.SortOption == "GovernorateAsc")">Location: A→Z</option>
+                            <option value="GovernorateDesc" selected="@(ViewBag.SortOption == "GovernorateDesc")">Location: Z→A</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="searchTerm" value="@(ViewBag.SearchTerm)" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filter Pills -->
+    <div class="category-filters">
+        <a asp-action="Index"
+           class="category-pill @(string.IsNullOrEmpty(ViewBag.CurrentCategory) ? "active" : "")">
+            <i class="fas fa-th-large"></i>
+            <span>All Events</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="Trending"
+           class="category-pill @(ViewBag.CurrentCategory == "Trending" ? "active" : "")">
+            <i class="fas fa-fire"></i>
+            <span>Trending</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="Concert"
+           class="category-pill @(ViewBag.CurrentCategory == "Concert" ? "active" : "")">
+            <i class="fas fa-music"></i>
+            <span>Concerts</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="SportEvent"
+           class="category-pill @(ViewBag.CurrentCategory == "SportEvent" ? "active" : "")">
+            <i class="fas fa-football-ball"></i>
+            <span>Sports</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="TheaterPlay"
+           class="category-pill @(ViewBag.CurrentCategory == "TheaterPlay" ? "active" : "")">
+            <i class="fas fa-theater-masks"></i>
+            <span>Theater</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="CulturalEvent"
+           class="category-pill @(ViewBag.CurrentCategory == "CulturalEvent" ? "active" : "")">
+            <i class="fas fa-landmark"></i>
+            <span>Cultural</span>
+        </a>
+        <a asp-action="FilterByCategory"
+           asp-route-category="TourismActivity"
+           class="category-pill @(ViewBag.CurrentCategory == "TourismActivity" ? "active" : "")">
+            <i class="fas fa-hiking"></i>
+            <span>Tourism</span>
+        </a>
+    </div>
+
+
+    <!-- Events Grid -->
+    <div class="events-grid">
+        @if (Model.Any())
+        {
+            @foreach (var ev in Model)
+            {
+                var venueCapacity = ev.Venue?.Capacity ?? 0;
+                var bookedSeats = ev.Bookings?.Where(b => b.Status != "Cancelled").Sum(b => b.NumberOfTickets) ?? 0;
+                var availableSeats = venueCapacity - bookedSeats;
+
+                var currencySymbol = ev.Currency switch
+                {
+                    Currency.EGP => "EGP",
+                    Currency.USD => "$",
+                    Currency.EUR => "€",
+                    _ => "EGP"
+                };
+
+                var eventPhotos = ViewBag.EventPhotos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+                var eventVideos = ViewBag.EventVideos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+
+                var photos = eventPhotos.ContainsKey(ev.EventId) ? eventPhotos[ev.EventId] : new List<string>();
+                var videos = eventVideos.ContainsKey(ev.EventId) ? eventVideos[ev.EventId] : new List<string>();
+
+                // Combine photos and videos
+                var mediaItems = new List<(string path, string type, int order)>();
+
+                for (int i = 0; i < photos.Count; i++)
+                {
+                    mediaItems.Add((photos[i], "photo", i));
+                }
+
+                for (int i = 0; i < videos.Count; i++)
+                {
+                    mediaItems.Add((videos[i], "video", photos.Count + i));
+                }
+
+                mediaItems = mediaItems.OrderBy(m => m.order).ToList();
+
+                <div class="event-card-wrapper" data-aos="fade-up">
+                    <div class="event-card">
+
+                        <!-- Media Carousel -->
+                        <div class="event-media-carousel" data-event-id="@ev.EventId">
+                            @if (mediaItems.Any())
+                            {
+                                @foreach (var media in mediaItems)
+                                {
+                                    if (media.type == "photo")
+                                    {
+                                        <div class="media-item media-photo">
+                                            <img src="@media.path" alt="@ev.Title" class="event-image" />
+                                        </div>
+                                    }
+                                    else if (media.type == "video")
+                                    {
+                                        <div class="media-item media-video">
+                                            <video class="event-video" preload="metadata">
+                                                <source src="@media.path" type="video/mp4">
+                                                Your browser does not support video.
+                                            </video>
+                                            <div class="video-overlay">
+                                                <button class="video-play-btn" type="button" aria-label="Play video">
+                                                    <i class="fas fa-play"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                <!-- Carousel Navigation -->
+                                @if (mediaItems.Count > 1)
+                                {
+                                    <button class="carousel-nav carousel-prev" onclick="prevMedia(@ev.EventId)" aria-label="Previous">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="carousel-nav carousel-next" onclick="nextMedia(@ev.EventId)" aria-label="Next">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+
+                                    <div class="carousel-indicators">
+                                        @for (int i = 0; i < mediaItems.Count; i++)
+                                        {
+                                            <button class="carousel-dot @(i == 0 ? "active" : "")"
+                                                    onclick="goToMedia(@ev.EventId, @i)"
+                                                    aria-label="Go to slide @(i + 1)"></button>
+                                        }
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="media-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>No Media Available</p>
+                                </div>
+                            }
+
+                            <!-- Category Badge -->
+                            <div class="category-badge">
+                                <i class="fas fa-tag"></i>
+                                <span>@ev.Category</span>
+                            </div>
+
+                            <!-- Sold Out Badge -->
+                            @if (availableSeats <= 0)
+                            {
+                                <div class="sold-out-badge">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Sold Out</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="event-card-content">
+
+                            <!-- Event Title -->
+                            <h3 class="event-title">@ev.Title</h3>
+
+                            <!-- Event Meta -->
+                            <div class="event-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>@ev.StartDate.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>@ev.StartDate.ToString("hh:mm tt")</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>@(ev.Venue?.Name ?? "TBA")</span>
+                                </div>
+                                @if (ev.Venue?.Governorate != null)
+                                {
+                                    <div class="meta-item">
+                                        <i class="fas fa-map-pin"></i>
+                                        <span>@ev.Venue.Governorate</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Price & Availability -->
+                            <div class="price-availability">
+                                <div class="price-box">
+                                    <span class="price-label">Starting from</span>
+                                    <div class="price-amount">
+                                        <span class="price-value">@ev.Price.ToString("N0")</span>
+                                        <span class="price-currency">@currencySymbol</span>
+                                    </div>
+                                </div>
+
+                                @if (availableSeats > 0)
+                                {
+                                    <div class="availability-box available">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>@availableSeats seats left</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="availability-box sold-out">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Sold Out</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="card-actions">
+                                <a asp-action="Details"
+                                   asp-route-id="@ev.EventId"
+                                   class="btn-card btn-details">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>View Details</span>
+                                </a>
+
+                                @if (isCustomer && availableSeats > 0)
+                                {
+                                    <a asp-controller="Booking"
+                                       asp-action="Book"
+                                       asp-route-eventId="@ev.EventId"
+                                       class="btn-card btn-book">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        <span>Book Now</span>
+                                    </a>
+                                }
+
+                                @if (isAdmin || isOrganizer)
+                                {
+                                    <div class="admin-actions">
+                                        <a asp-action="Edit"
+                                           asp-route-id="@ev.EventId"
+                                           class="btn-card btn-edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete"
+                                           asp-route-id="@ev.EventId"
+                                           class="btn-card btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <h3 class="empty-title">No Events Found</h3>
+                <p class="empty-text">We couldn't find any events matching your search. Try adjusting your filters or browse all events.</p>
+                <a asp-action="Index" class="btn-empty-reset">
+                    <i class="fas fa-redo-alt"></i>
+                    <span>Show All Events</span>
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav class="pagination-wrapper">
+            <ul class="pagination">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-searchTerm="@(ViewBag.SearchTerm)"
+                       asp-route-sortOption="@(ViewBag.SortOption)">
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Previous</span>
+                    </a>
+                </li>
+
+                @{
+                    var currentPage = ViewBag.CurrentPage;
+                    var totalPages = ViewBag.TotalPages;
+                    var startPage = Math.Max(1, currentPage - 2);
+                    var endPage = Math.Min(totalPages, currentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchTerm="@(ViewBag.SearchTerm)" asp-route-sortOption="@(ViewBag.SortOption)">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-searchTerm="@(ViewBag.SearchTerm)"
+                               asp-route-sortOption="@(ViewBag.SortOption)">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                    if (endPage < totalPages)
+                    {
+                        if (endPage < totalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@totalPages" asp-route-searchTerm="@(ViewBag.SearchTerm)" asp-route-sortOption="@(ViewBag.SortOption)">@totalPages</a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-searchTerm="@(ViewBag.SearchTerm)"
+                       asp-route-sortOption="@(ViewBag.SortOption)">
+                        <span>Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Carousel Management System
+        const carousels = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCarousels();
+            initializeScrollAnimations();
+        });
+
+        function initializeCarousels() {
+            document.querySelectorAll('.event-media-carousel').forEach(carousel => {
+                const eventId = carousel.dataset.eventId;
+                const mediaItems = carousel.querySelectorAll('.media-item');
+
+                if (mediaItems.length > 0) {
+                    mediaItems[0].classList.add('active');
+
+                    carousels[eventId] = {
+                        currentIndex: 0,
+                        media: mediaItems,
+                        dots: carousel.querySelectorAll('.carousel-dot'),
+                        interval: null
+                    };
+
+                    // Start auto-rotation
+                    startAutoRotate(eventId);
+
+                    // Pause on hover
+                    carousel.addEventListener('mouseenter', () => stopAutoRotate(eventId));
+                    carousel.addEventListener('mouseleave', () => startAutoRotate(eventId));
+
+                    // Setup video controls
+                    setupVideoControls(carousel, eventId);
+                }
+            });
+        }
+
+        function setupVideoControls(carousel, eventId) {
+            carousel.querySelectorAll('.video-play-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const videoItem = this.closest('.media-video');
+                    const video = videoItem.querySelector('.event-video');
+                    const overlay = videoItem.querySelector('.video-overlay');
+
+                    // Pause all other videos
+                    document.querySelectorAll('.event-video').forEach(v => {
+                        if (v !== video && !v.paused) {
+                            v.pause();
+                            v.currentTime = 0;
+                            const otherOverlay = v.closest('.media-video').querySelector('.video-overlay');
+                            otherOverlay.classList.remove('playing');
+                        }
+                    });
+
+                    if (video.paused) {
+                        video.play();
+                        overlay.classList.add('playing');
+                        stopAutoRotate(eventId);
+                    } else {
+                        video.pause();
+                        overlay.classList.remove('playing');
+                        startAutoRotate(eventId);
+                    }
+                });
+            });
+
+            // Handle video click to pause
+            carousel.querySelectorAll('.event-video').forEach(video => {
+                video.addEventListener('click', function(e) {
+                    if (!video.paused) {
+                        e.stopPropagation();
+                        video.pause();
+                        const overlay = video.closest('.media-video').querySelector('.video-overlay');
+                        overlay.classList.remove('playing');
+                        startAutoRotate(eventId);
+                    }
+                });
+
+                // Handle video end
+                video.addEventListener('ended', function() {
+                    const overlay = video.closest('.media-video').querySelector('.video-overlay');
+                    overlay.classList.remove('playing');
+                    video.currentTime = 0;
+                    startAutoRotate(eventId);
+                });
+            });
+        }
+
+        function startAutoRotate(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel || carousel.media.length <= 1) return;
+
+            stopAutoRotate(eventId);
+
+            carousel.interval = setInterval(() => {
+                const currentMedia = carousel.media[carousel.currentIndex];
+                const video = currentMedia.querySelector('.event-video');
+
+                // Don't rotate if video is playing
+                if (video && !video.paused) return;
+
+                nextMedia(eventId);
+            }, 5000); // 5 seconds
+        }
+
+        function stopAutoRotate(eventId) {
+            const carousel = carousels[eventId];
+            if (carousel && carousel.interval) {
+                clearInterval(carousel.interval);
+                carousel.interval = null;
+            }
+        }
+
+        function nextMedia(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = (carousel.currentIndex + 1) % carousel.media.length;
+            updateCarousel(eventId);
+        }
+
+        function prevMedia(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = (carousel.currentIndex - 1 + carousel.media.length) % carousel.media.length;
+            updateCarousel(eventId);
+        }
+
+        function goToMedia(eventId, index) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = index;
+            updateCarousel(eventId);
+            stopAutoRotate(eventId);
+            startAutoRotate(eventId);
+        }
+
+        function pauseCurrentVideo(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            const currentMedia = carousel.media[carousel.currentIndex];
+            const video = currentMedia.querySelector('.event-video');
+
+            if (video && !video.paused) {
+                video.pause();
+                video.currentTime = 0;
+                const overlay = currentMedia.querySelector('.video-overlay');
+                overlay.classList.remove('playing');
+            }
+        }
+
+        function updateCarousel(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            carousel.media.forEach((media, index) => {
+                media.classList.toggle('active', index === carousel.currentIndex);
+            });
+
+            carousel.dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === carousel.currentIndex);
+            });
+        }
+
+        function initializeScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.event-card-wrapper').forEach(card => {
+                observer.observe(card);
+            });
+        }
+    </script>
+}

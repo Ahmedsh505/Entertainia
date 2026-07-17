@@ -1,0 +1,234 @@
+﻿/* ============================
+   LIGHT EGYPTIAN THEME + GOLD
+   ACCESS DENIED PAGE (403)
+   ============================ */
+
+:root {
+    --color-bg-elevated: #ffffff;
+    --color-text-primary: #0b2235;
+    --color-text-secondary: #3b4f61;
+    --color-accent-start: #C59D3B;
+    --color-accent-end: #E0B95A;
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --radius-md: 12px;
+    --radius-lg: 22px;
+    --shadow-glow: 0 0 14px rgba(197, 157, 59, 0.35);
+}
+
+/* ============================
+   PAGE LAYOUT
+   ============================ */
+.error-container {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fafafa;
+    padding: 30px 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating circles background */
+.error-background .error-circle {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: var(--gradient-primary);
+    opacity: 0.17;
+    filter: blur(55px);
+    border-radius: 50%;
+    animation: floatCircle 9s infinite ease-in-out;
+}
+
+    .error-background .error-circle:nth-child(1) {
+        top: -40px;
+        left: -40px;
+        animation-delay: 0s;
+    }
+
+    .error-background .error-circle:nth-child(2) {
+        bottom: -50px;
+        right: -30px;
+        animation-delay: 2s;
+    }
+
+    .error-background .error-circle:nth-child(3) {
+        bottom: 20%;
+        left: -60px;
+        animation-delay: 4s;
+    }
+
+@keyframes floatCircle {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(26px);
+    }
+}
+
+/* ============================
+   CARD
+   ============================ */
+.error-card {
+    position: relative;
+    z-index: 10;
+    background: var(--color-bg-elevated);
+    width: 100%;
+    max-width: 700px;
+    border-radius: var(--radius-lg);
+    padding-bottom: 30px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+}
+
+/* Header */
+.error-header {
+    text-align: center;
+    padding: 34px 20px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--gradient-primary);
+    color: #fff;
+}
+
+.error-icon-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.error-icon-bg {
+    background: rgba(255,255,255,0.18);
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadow-glow);
+}
+
+.error-icon {
+    font-size: 40px;
+}
+
+.error-title {
+    margin-top: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/* ============================
+   BODY
+   ============================ */
+.error-body {
+    padding: 32px 36px;
+    color: var(--color-text-primary);
+    text-align: center;
+}
+
+.error-code {
+    font-size: 78px;
+    font-weight: 900;
+    color: var(--color-accent-start);
+    margin-bottom: 10px;
+}
+
+.error-message {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.error-description {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    margin-top: 8px;
+    margin-bottom: 25px;
+}
+
+/* ============================
+   ACTION BUTTONS
+   ============================ */
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.error-btn {
+    padding: 12px 18px;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: .25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Primary (Gold) */
+.error-btn-primary {
+    background: var(--gradient-primary);
+    color: #fff !important;
+    border: none;
+}
+
+    .error-btn-primary:hover {
+        opacity: 0.92;
+        transform: translateY(-2px);
+    }
+
+/* Secondary (Soft gray) */
+.error-btn-secondary {
+    background: #e9ecef;
+    color: var(--color-text-primary) !important;
+}
+
+    .error-btn-secondary:hover {
+        background: #dfe3e6;
+        transform: translateY(-2px);
+    }
+
+/* ============================
+   INFO SECTION
+   ============================ */
+.error-info {
+    background: #fffdf3;
+    border-left: 4px solid var(--color-accent-start);
+    padding: 18px 16px;
+    border-radius: 12px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.error-info-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.error-info-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+    .error-info-list li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-text-secondary);
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+
+    .error-info-list i {
+        color: var(--color-accent-start);
+    }

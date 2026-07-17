@@ -1,0 +1,214 @@
+﻿@model Entertainia.ViewModels.Account.ConfirmEmailVM
+@{
+    ViewData["Title"] = "Confirm Your Email";
+    var email = ViewBag.Email as string;
+    var userId = ViewBag.UserId as int?;
+}
+
+<link rel="stylesheet" href="~/css/Account/ConfirmEmail.css" asp-append-version="true" />
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h1 class="auth-title">Verify Your Email</h1>
+            <p class="auth-subtitle">We've sent a verification code to</p>
+            <p class="email-display">@email</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Success/Error Messages -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <!-- Verification Code Form -->
+            <form asp-action="ConfirmEmail" method="post" id="confirmEmailForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Email" value="@email" />
+
+                <div class="form-group">
+                    <label asp-for="Code" class="field-label">
+                        <i class="bi bi-key-fill"></i>
+                        <span>Enter 6-Digit Code</span>
+                    </label>
+
+                    <div class="code-input-container">
+                        <input type="text"
+                               asp-for="Code"
+                               class="code-input"
+                               placeholder="000000"
+                               maxlength="6"
+                               pattern="\d{6}"
+                               autocomplete="off"
+                               autofocus
+                               id="codeInput" />
+                    </div>
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="bi bi-check-circle me-2"></i> Verify Email
+                </button>
+            </form>
+
+            <!-- Resend Code Section -->
+            <div class="resend-section">
+                <p class="resend-text">Didn't receive the code?</p>
+                <form asp-action="ResendConfirmationCode" method="post" id="resendForm">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-resend" id="resendBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Resend Code
+                    </button>
+                </form>
+                <p class="cooldown-text" id="cooldownText" style="display: none;">
+                    Wait <span id="cooldownTimer">60</span> seconds before resending
+                </p>
+            </div>
+
+            <!-- Help Section -->
+            <div class="help-section">
+                <div class="help-item">
+                    <i class="bi bi-clock-fill"></i>
+                    <span>Code expires in <strong>5 minutes</strong></span>
+                </div>
+                <div class="help-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <span>Check your spam folder if not received</span>
+                </div>
+                <div class="help-item">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    <span>Never share your verification code</span>
+                </div>
+            </div>
+
+            <!-- Back to Login -->
+            <div class="auth-footer-link">
+                <a asp-action="Login" class="back-link">
+                    <i class="bi bi-arrow-left"></i> Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Auto-format code input (add spaces every 3 digits for readability)
+        const codeInput = document.getElementById('codeInput');
+        const resendBtn = document.getElementById('resendBtn');
+        const cooldownText = document.getElementById('cooldownText');
+        const cooldownTimer = document.getElementById('cooldownTimer');
+        const resendForm = document.getElementById('resendForm');
+
+        // Only allow numbers
+        if (codeInput) {
+            codeInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                // Auto-submit when 6 digits entered
+                if (this.value.length === 6) {
+                    // Add a small delay for better UX
+                    setTimeout(() => {
+                        document.getElementById('confirmEmailForm').submit();
+                    }, 300);
+                }
+            });
+
+            // Prevent paste of non-numeric characters
+            codeInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const numericOnly = pastedText.replace(/[^0-9]/g, '').substring(0, 6);
+                this.value = numericOnly;
+
+                // Auto-submit if 6 digits pasted
+                if (numericOnly.length === 6) {
+                    setTimeout(() => {
+                        document.getElementById('confirmEmailForm').submit();
+                    }, 300);
+                }
+            });
+        }
+
+        // Resend cooldown timer (1 minute)
+        let cooldownActive = false;
+        let cooldownSeconds = 60;
+        let cooldownInterval;
+
+        if (resendForm) {
+            resendForm.addEventListener('submit', function(e) {
+                if (cooldownActive) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Start cooldown after form submission
+                startCooldown();
+            });
+        }
+
+        function startCooldown() {
+            cooldownActive = true;
+            cooldownSeconds = 60;
+
+            if (resendBtn) {
+                resendBtn.disabled = true;
+                resendBtn.classList.add('disabled');
+            }
+
+            if (cooldownText) {
+                cooldownText.style.display = 'block';
+            }
+
+            cooldownInterval = setInterval(() => {
+                cooldownSeconds--;
+                if (cooldownTimer) {
+                    cooldownTimer.textContent = cooldownSeconds;
+                }
+
+                if (cooldownSeconds <= 0) {
+                    clearInterval(cooldownInterval);
+                    cooldownActive = false;
+
+                    if (resendBtn) {
+                        resendBtn.disabled = false;
+                        resendBtn.classList.remove('disabled');
+                    }
+
+                    if (cooldownText) {
+                        cooldownText.style.display = 'none';
+                    }
+                }
+            }, 1000);
+        }
+
+        // Check if we just resent (from TempData)
+        @if (TempData["Success"] != null && TempData["Success"].ToString().Contains("new verification code"))
+        {
+                <text>
+                startCooldown();
+                </text>
+        }
+
+        // Focus on code input
+        if (codeInput) {
+            codeInput.focus();
+        }
+    </script>
+}

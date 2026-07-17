@@ -1,0 +1,1126 @@
+﻿@model IEnumerable<EventBase>
+@using System.Security.Claims
+@using Core.Enums
+@using Core.Models.EventModels
+@{
+    ViewData["Title"] = "Home";
+    var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+    var isAdmin = userRole == "Admin";
+    var isOrganizer = userRole == "Organizer";
+    var isCustomer = userRole == "Customer";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Home/Home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Components/ReviewModal.css" asp-append-version="true" />
+}
+
+<!-- Hero Section with Logo -->
+<section class="hero-section">
+    <div class="hero-background">
+        <img src="~/uploads/Background/Background.png" alt="Entertainment Background" class="hero-bg-image" />
+        <div class="hero-image-overlay"></div>
+        <div class="hero-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <div class="container hero-content">
+        <!-- Logo Display in Hero -->
+
+        <h1 class="hero-title text-center">
+            Experience Entertainment<br />Like Never Before
+        </h1>
+        <p class="hero-subtitle text-center">
+            Discover concerts, theater plays, sports events, and cultural experiences.
+            Book your tickets effortlessly and create unforgettable memories.
+        </p>
+
+        <div class="hero-cta">
+            <a asp-controller="Events" asp-action="Index" class="btn btn-primary btn-lg">
+                <i class="bi bi-calendar-event me-2"></i>
+                Explore Events
+            </a>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Get Started
+                </a>
+            }
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Events</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Happy Customers</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Venues</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose Entertania?</h2>
+            <p class="section-subtitle">
+                Your one-stop platform for all entertainment needs
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h3 class="feature-title">Easy Booking</h3>
+                    <p class="feature-description">
+                        Book tickets in seconds with our intuitive platform. No hassle, just entertainment.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-ticket-perforated"></i>
+                    </div>
+                    <h3 class="feature-title">Exclusive Events</h3>
+                    <p class="feature-description">
+                        Access to premium concerts, theater plays, sports events, and cultural experiences.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">Secure Payments</h3>
+                    <p class="feature-description">
+                        Your transactions are protected with enterprise-grade security and encryption.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h3 class="feature-title">24/7 Support</h3>
+                    <p class="feature-description">
+                        Our dedicated support team is always here to help you with any questions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Events Preview Section -->
+<section class="trending-events">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Trending Events</h2>
+            <p class="section-subtitle">Check out the hottest events right now</p>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="events-grid">
+            @if (Model.Any())
+            {
+                @foreach (var ev in Model)
+                {
+                    var venueCapacity = ev.Venue?.Capacity ?? 0;
+                    var bookedSeats = ev.Bookings?.Where(b => b.Status != "Cancelled").Sum(b => b.NumberOfTickets) ?? 0;
+                    var availableSeats = venueCapacity - bookedSeats;
+
+                    var currencySymbol = ev.Currency switch
+                    {
+                        Currency.EGP => "EGP",
+                        Currency.USD => "$",
+                        Currency.EUR => "€",
+                        _ => "EGP"
+                    };
+
+                    var eventPhotos = ViewBag.EventPhotos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+                    var eventVideos = ViewBag.EventVideos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+
+                    var photos = eventPhotos.ContainsKey(ev.EventId) ? eventPhotos[ev.EventId] : new List<string>();
+                    var videos = eventVideos.ContainsKey(ev.EventId) ? eventVideos[ev.EventId] : new List<string>();
+
+                    // Combine photos and videos
+                    var mediaItems = new List<(string path, string type, int order)>();
+
+                    for (int i = 0; i < photos.Count; i++)
+                    {
+                        mediaItems.Add((photos[i], "photo", i));
+                    }
+
+                    for (int i = 0; i < videos.Count; i++)
+                    {
+                        mediaItems.Add((videos[i], "video", photos.Count + i));
+                    }
+
+                    mediaItems = mediaItems.OrderBy(m => m.order).ToList();
+
+                    <div class="event-card-wrapper" data-aos="fade-up">
+                        <div class="event-card">
+
+                            <!-- Media Carousel -->
+                            <div class="event-media-carousel" data-event-id="@ev.EventId">
+                                @if (mediaItems.Any())
+                                {
+                                    @foreach (var media in mediaItems)
+                                    {
+                                        if (media.type == "photo")
+                                        {
+                                            <div class="media-item media-photo">
+                                                <img src="@media.path" alt="@ev.Title" class="event-image" />
+                                            </div>
+                                        }
+                                        else if (media.type == "video")
+                                        {
+                                            <div class="media-item media-video">
+                                                <video class="event-video" preload="metadata">
+                                                    <source src="@media.path" type="video/mp4">
+                                                    Your browser does not support video.
+                                                </video>
+                                                <div class="video-overlay">
+                                                    <button class="video-play-btn" type="button" aria-label="Play video">
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+
+                                    <!-- Carousel Navigation -->
+                                    @if (mediaItems.Count > 1)
+                                    {
+                                        <button class="carousel-nav carousel-prev" onclick="prevMedia(@ev.EventId)" aria-label="Previous">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="carousel-nav carousel-next" onclick="nextMedia(@ev.EventId)" aria-label="Next">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+
+                                        <div class="carousel-indicators">
+                                            @for (int i = 0; i < mediaItems.Count; i++)
+                                            {
+                                                <button class="carousel-dot @(i == 0 ? "active" : "")"
+                                                        onclick="goToMedia(@ev.EventId, @i)"
+                                                        aria-label="Go to slide @(i + 1)"></button>
+                                            }
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="media-placeholder">
+                                        <i class="fas fa-image"></i>
+                                        <p>No Media Available</p>
+                                    </div>
+                                }
+
+                                <!-- Category Badge -->
+                                <div class="category-badge">
+                                    <i class="fas fa-tag"></i>
+                                    <span>@ev.Category</span>
+                                </div>
+
+                                <!-- Sold Out Badge -->
+                                @if (availableSeats <= 0)
+                                {
+                                    <div class="sold-out-badge">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Sold Out</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Card Content -->
+                            <div class="event-card-content">
+
+                                <!-- Event Title -->
+                                <h3 class="event-title">@ev.Title</h3>
+
+                                <!-- Event Meta -->
+                                <div class="event-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>@ev.StartDate.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>@ev.StartDate.ToString("hh:mm tt")</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>@(ev.Venue?.Name ?? "TBA")</span>
+                                    </div>
+                                    @if (ev.Venue?.Governorate != null)
+                                    {
+                                        <div class="meta-item">
+                                            <i class="fas fa-map-pin"></i>
+                                            <span>@ev.Venue.Governorate</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Price & Availability -->
+                                <div class="price-availability">
+                                    <div class="price-box">
+                                        <span class="price-label">Starting from</span>
+                                        <div class="price-amount">
+                                            <span class="price-value">@ev.Price.ToString("N0")</span>
+                                            <span class="price-currency">@currencySymbol</span>
+                                        </div>
+                                    </div>
+
+                                    @if (availableSeats > 0)
+                                    {
+                                        <div class="availability-box available">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>@availableSeats seats left</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="availability-box sold-out">
+                                            <i class="fas fa-times-circle"></i>
+                                            <span>Sold Out</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="card-actions">
+                                    <a asp-action="Details"
+                                       asp-route-id="@ev.EventId"
+                                       class="btn-card btn-details">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>View Details</span>
+                                    </a>
+
+                                    @if (isCustomer && availableSeats > 0)
+                                    {
+                                        <a asp-controller="Booking"
+                                           asp-action="Book"
+                                           asp-route-eventId="@ev.EventId"
+                                           class="btn-card btn-book">
+                                            <i class="fas fa-ticket-alt"></i>
+                                            <span>Book Now</span>
+                                        </a>
+                                    }
+
+                                    @if (isAdmin || isOrganizer)
+                                    {
+                                        <div class="admin-actions">
+                                            <a asp-action="Edit"
+                                               asp-route-id="@ev.EventId"
+                                               class="btn-card btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete"
+                                               asp-route-id="@ev.EventId"
+                                               class="btn-card btn-delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <h3 class="empty-title">No Events Found</h3>
+                    <p class="empty-text">We couldn't find any events matching your search. Try adjusting your filters or browse all events.</p>
+                    <a asp-action="Index" class="btn-empty-reset">
+                        <i class="fas fa-redo-alt"></i>
+                        <span>Show All Events</span>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="reviews-section" id="reviewsSection">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">What Our Customers Say</h2>
+            <p class="section-subtitle">Real experiences from real people</p>
+        </div>
+
+        @if (ViewBag.Reviews != null && ((List<Core.Models.Review>)ViewBag.Reviews).Any())
+        {
+            <div class="reviews-carousel-wrapper">
+                <div class="reviews-carousel" id="reviewsCarousel">
+                    @foreach (var review in (List<Core.Models.Review>)ViewBag.Reviews)
+                    {
+                        <div class="review-card" data-review-id="@review.ReviewId">
+                            <div class="review-header">
+                                <div class="review-avatar-section">
+                                    @if (!string.IsNullOrEmpty(review.ProfilePicturePath))
+                                    {
+                                        <img src="@review.ProfilePicturePath" alt="@review.Name" class="review-avatar" />
+                                    }
+                                    else
+                                    {
+                                        var nameParts = review.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                        var initials = "";
+                                        if (nameParts.Length > 0)
+                                        {
+                                            initials += nameParts[0][0];
+                                            if (nameParts.Length > 1)
+                                            {
+                                                initials += nameParts[nameParts.Length - 1][0];
+                                            }
+                                        }
+                                        <div class="review-avatar-initials">@initials.ToUpper()</div>
+                                    }
+                                </div>
+
+                                <div class="review-author-info">
+                                    <h4 class="review-author-name">@review.Name</h4>
+                                    <div class="review-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <button class="btn-delete-review" onclick="deleteReview(@review.ReviewId)" title="Delete Review">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="review-body">
+                                <p class="review-text">@review.Comment</p>
+                            </div>
+
+                            <div class="review-footer">
+                                <span class="review-date">
+                                    <i class="bi bi-calendar3"></i>
+                                    @review.CreatedAt.ToString("MMM dd, yyyy")
+                                </span>
+                                @if (review.UserId.HasValue)
+                                {
+                                    <span class="review-verified">
+                                        <i class="bi bi-patch-check-fill"></i>
+                                        Verified Customer
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Carousel Navigation -->
+                <button class="carousel-control carousel-prev" id="reviewsPrev" aria-label="Previous reviews">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="carousel-control carousel-next" id="reviewsNext" aria-label="Next reviews">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+
+                <!-- Carousel Dots -->
+                <div class="carousel-dots" id="reviewsDots"></div>
+            </div>
+        }
+        else
+        {
+            <div class="no-reviews-state">
+                <i class="bi bi-chat-quote"></i>
+                <p>No reviews yet. Be the first to share your experience!</p>
+            </div>
+        }
+
+        <!-- Call to Action -->
+        <div class="reviews-cta">
+            <a href="#reviewFormSection" class="btn-write-review">
+                <i class="bi bi-pencil-square"></i>
+                Write a Review
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Review Form Section -->
+<!-- Review Modal Popup System -->
+<!-- Review Modal -->
+<div class="review-modal-overlay" id="reviewModalOverlay" onclick="closeReviewModalOnClickOutside(event)">
+    <div class="review-modal" id="reviewModal">
+        <!-- Modal Header -->
+        <div class="review-modal-header">
+            <div class="modal-header-content">
+                <div class="modal-icon">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div>
+                    <h2 class="modal-title">Share Your Experience</h2>
+                    <p class="modal-subtitle">We'd love to hear what you think about Entertania</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeReviewModal()" title="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="review-modal-body">
+            <form asp-action="SubmitReview" asp-controller="Home" method="post" id="reviewModalForm" onsubmit="handleReviewSubmit(event)">
+                @Html.AntiForgeryToken()
+
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <!-- Guest User Fields -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="modalName" class="form-label">
+                                <i class="bi bi-person-fill"></i>
+                                <span>Your Name</span>
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <input type="text"
+                                   class="modal-form-control"
+                                   id="modalName"
+                                   name="name"
+                                   placeholder="Enter your full name"
+                                   required
+                                   maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modalEmail" class="form-label">
+                                <i class="bi bi-envelope-fill"></i>
+                                <span>Email Address</span>
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <input type="email"
+                                   class="modal-form-control"
+                                   id="modalEmail"
+                                   name="email"
+                                   placeholder="your.email@example.com"
+                                   required
+                                   maxlength="100">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="modalPhone" class="form-label">
+                                <i class="bi bi-telephone-fill"></i>
+                                <span>Phone Number</span>
+                                <span class="optional-indicator">(Optional)</span>
+                            </label>
+                            <input type="tel"
+                                   class="modal-form-control"
+                                   id="modalPhone"
+                                   name="phoneNumber"
+                                   placeholder="+20 XXX XXX XXXX"
+                                   maxlength="20">
+                        </div>
+                    </div>
+                }
+
+                <!-- Star Rating -->
+                <div class="rating-section">
+                    <label class="rating-label">
+                        <i class="bi bi-star-half"></i>
+                        <span>How would you rate your experience?</span>
+                        <span class="required-indicator">*</span>
+                    </label>
+
+                    <div class="star-rating-container">
+                        <div class="star-rating-modal">
+                            <input type="radio" id="modalStar5" name="rating" value="5" required />
+                            <label for="modalStar5" title="Excellent - 5 stars">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+
+                            <input type="radio" id="modalStar4" name="rating" value="4" />
+                            <label for="modalStar4" title="Good - 4 stars">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+
+                            <input type="radio" id="modalStar3" name="rating" value="3" />
+                            <label for="modalStar3" title="Average - 3 stars">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+
+                            <input type="radio" id="modalStar2" name="rating" value="2" />
+                            <label for="modalStar2" title="Poor - 2 stars">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+
+                            <input type="radio" id="modalStar1" name="rating" value="1" />
+                            <label for="modalStar1" title="Terrible - 1 star">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+                        </div>
+
+                        <div class="rating-feedback">
+                            <span class="rating-text" id="modalRatingText">Click to rate</span>
+                            <div class="rating-emojis">
+                                <span class="rating-emoji" data-rating="1">😞</span>
+                                <span class="rating-emoji" data-rating="2">😕</span>
+                                <span class="rating-emoji" data-rating="3">😐</span>
+                                <span class="rating-emoji" data-rating="4">😊</span>
+                                <span class="rating-emoji active" data-rating="5">🤩</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment -->
+                <div class="form-group full-width">
+                    <label for="modalComment" class="form-label">
+                        <i class="bi bi-chat-text-fill"></i>
+                        <span>Tell us about your experience</span>
+                        <span class="required-indicator">*</span>
+                    </label>
+                    <textarea class="modal-form-control modal-textarea"
+                              id="modalComment"
+                              name="comment"
+                              placeholder="Share your thoughts, suggestions, or feedback..."
+                              required
+                              maxlength="1000"
+                              minlength="10"
+                              rows="5"></textarea>
+                    <div class="char-counter">
+                        <i class="bi bi-type"></i>
+                        <span><span id="modalCharCount">0</span> / 1000 characters</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-secondary" onclick="closeReviewModal()">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button type="submit" class="btn-modal-primary" id="submitReviewBtn">
+                        <span class="btn-content">
+                            <i class="bi bi-send-fill"></i>
+                            <span>Submit Review</span>
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner"></span>
+                            <span>Submitting...</span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Modal Control Functions
+    function openReviewModal() {
+        const overlay = document.getElementById('reviewModalOverlay');
+        const modal = document.getElementById('reviewModal');
+
+        overlay.classList.add('active');
+        modal.classList.add('active');
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+
+        // Focus first input
+        setTimeout(() => {
+            const firstInput = modal.querySelector('input:not([type="radio"]), textarea');
+            if (firstInput) firstInput.focus();
+        }, 300);
+    }
+
+    function closeReviewModal() {
+        const overlay = document.getElementById('reviewModalOverlay');
+        const modal = document.getElementById('reviewModal');
+
+        overlay.classList.remove('active');
+        modal.classList.remove('active');
+
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+
+    function closeReviewModalOnClickOutside(event) {
+        if (event.target.id === 'reviewModalOverlay') {
+            closeReviewModal();
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeReviewModal();
+        }
+    });
+
+    // Star Rating Interaction
+    document.querySelectorAll('.star-rating-modal input').forEach(input => {
+        input.addEventListener('change', function() {
+            const rating = parseInt(this.value);
+            const ratingText = document.getElementById('modalRatingText');
+            const emojis = document.querySelectorAll('.rating-emoji');
+            const ratingTexts = ['Terrible', 'Poor', 'Average', 'Good', 'Excellent'];
+
+            ratingText.textContent = ratingTexts[rating - 1];
+            ratingText.style.color = '#C59D3B';
+
+            // Update emojis
+            emojis.forEach(emoji => {
+                emoji.classList.remove('active');
+                if (parseInt(emoji.dataset.rating) === rating) {
+                    emoji.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // Character Counter
+    const commentField = document.getElementById('modalComment');
+    const charCount = document.getElementById('modalCharCount');
+
+    if (commentField && charCount) {
+        commentField.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+
+            // Visual feedback for character limit
+            if (count > 900) {
+                charCount.style.color = '#dc3545';
+            } else if (count > 750) {
+                charCount.style.color = '#ffc107';
+            } else {
+                charCount.style.color = '#6c757d';
+            }
+        });
+    }
+
+    // Form Validation & Submit
+    function handleReviewSubmit(event) {
+        event.preventDefault();
+
+        const rating = document.querySelector('.star-rating-modal input:checked');
+        const comment = commentField.value.trim();
+        const submitBtn = document.getElementById('submitReviewBtn');
+
+        // Validation
+        if (!rating) {
+            showNotification('Please select a rating', 'warning');
+            return false;
+        }
+
+        if (comment.length < 10) {
+            showNotification('Please write at least 10 characters', 'warning');
+            commentField.focus();
+            return false;
+        }
+
+        // Show loading state
+        submitBtn.querySelector('.btn-content').style.display = 'none';
+        submitBtn.querySelector('.btn-loading').style.display = 'flex';
+        submitBtn.disabled = true;
+
+        // Submit form (let ASP.NET handle the actual submission)
+        document.getElementById('reviewModalForm').submit();
+    }
+
+    // Notification System
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `review-notification ${type}`;
+        notification.innerHTML = `
+            <i class="bi bi-${type === 'success' ? 'check-circle-fill' :
+                               type === 'warning' ? 'exclamation-triangle-fill' :
+                               'info-circle-fill'}"></i>
+            <span>${message}</span>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => notification.classList.add('show'), 10);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 4000);
+    }
+
+    // Update the "Write Review" link in the reviews section to open modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const writeReviewLinks = document.querySelectorAll('a[href="#reviewFormSection"]');
+        writeReviewLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                openReviewModal();
+            });
+        });
+    });
+</script>
+@section Scripts {
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .event-card, .testimonial-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+  
+    <script>
+        // Carousel Management System
+        const carousels = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCarousels();
+            initializeScrollAnimations();
+        });
+
+        function initializeCarousels() {
+            document.querySelectorAll('.event-media-carousel').forEach(carousel => {
+                const eventId = carousel.dataset.eventId;
+                const mediaItems = carousel.querySelectorAll('.media-item');
+
+                if (mediaItems.length > 0) {
+                    mediaItems[0].classList.add('active');
+
+                    carousels[eventId] = {
+                        currentIndex: 0,
+                        media: mediaItems,
+                        dots: carousel.querySelectorAll('.carousel-dot'),
+                        interval: null
+                    };
+
+                    // Start auto-rotation
+                    startAutoRotate(eventId);
+
+                    // Pause on hover
+                    carousel.addEventListener('mouseenter', () => stopAutoRotate(eventId));
+                    carousel.addEventListener('mouseleave', () => startAutoRotate(eventId));
+
+                    // Setup video controls
+                    setupVideoControls(carousel, eventId);
+                }
+            });
+        }
+
+        function setupVideoControls(carousel, eventId) {
+            carousel.querySelectorAll('.video-play-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const videoItem = this.closest('.media-video');
+                    const video = videoItem.querySelector('.event-video');
+                    const overlay = videoItem.querySelector('.video-overlay');
+
+                    // Pause all other videos
+                    document.querySelectorAll('.event-video').forEach(v => {
+                        if (v !== video && !v.paused) {
+                            v.pause();
+                            v.currentTime = 0;
+                            const otherOverlay = v.closest('.media-video').querySelector('.video-overlay');
+                            otherOverlay.classList.remove('playing');
+                        }
+                    });
+
+                    if (video.paused) {
+                        video.play();
+                        overlay.classList.add('playing');
+                        stopAutoRotate(eventId);
+                    } else {
+                        video.pause();
+                        overlay.classList.remove('playing');
+                        startAutoRotate(eventId);
+                    }
+                });
+            });
+
+            // Handle video click to pause
+            carousel.querySelectorAll('.event-video').forEach(video => {
+                video.addEventListener('click', function(e) {
+                    if (!video.paused) {
+                        e.stopPropagation();
+                        video.pause();
+                        const overlay = video.closest('.media-video').querySelector('.video-overlay');
+                        overlay.classList.remove('playing');
+                        startAutoRotate(eventId);
+                    }
+                });
+
+                // Handle video end
+                video.addEventListener('ended', function() {
+                    const overlay = video.closest('.media-video').querySelector('.video-overlay');
+                    overlay.classList.remove('playing');
+                    video.currentTime = 0;
+                    startAutoRotate(eventId);
+                });
+            });
+        }
+
+        function startAutoRotate(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel || carousel.media.length <= 1) return;
+
+            stopAutoRotate(eventId);
+
+            carousel.interval = setInterval(() => {
+                const currentMedia = carousel.media[carousel.currentIndex];
+                const video = currentMedia.querySelector('.event-video');
+
+                // Don't rotate if video is playing
+                if (video && !video.paused) return;
+
+                nextMedia(eventId);
+            }, 5000); // 5 seconds
+        }
+
+        function stopAutoRotate(eventId) {
+            const carousel = carousels[eventId];
+            if (carousel && carousel.interval) {
+                clearInterval(carousel.interval);
+                carousel.interval = null;
+            }
+        }
+
+        function nextMedia(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = (carousel.currentIndex + 1) % carousel.media.length;
+            updateCarousel(eventId);
+        }
+
+        function prevMedia(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = (carousel.currentIndex - 1 + carousel.media.length) % carousel.media.length;
+            updateCarousel(eventId);
+        }
+
+        function goToMedia(eventId, index) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            pauseCurrentVideo(eventId);
+            carousel.currentIndex = index;
+            updateCarousel(eventId);
+            stopAutoRotate(eventId);
+            startAutoRotate(eventId);
+        }
+
+        function pauseCurrentVideo(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            const currentMedia = carousel.media[carousel.currentIndex];
+            const video = currentMedia.querySelector('.event-video');
+
+            if (video && !video.paused) {
+                video.pause();
+                video.currentTime = 0;
+                const overlay = currentMedia.querySelector('.video-overlay');
+                overlay.classList.remove('playing');
+            }
+        }
+
+        function updateCarousel(eventId) {
+            const carousel = carousels[eventId];
+            if (!carousel) return;
+
+            carousel.media.forEach((media, index) => {
+                media.classList.toggle('active', index === carousel.currentIndex);
+            });
+
+            carousel.dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === carousel.currentIndex);
+            });
+        }
+
+        function initializeScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.event-card-wrapper').forEach(card => {
+                observer.observe(card);
+            });
+        }
+    </script>
+
+    <script>
+        // Reviews Carousel System
+        let currentReviewIndex = 0;
+        const reviewsPerView = window.innerWidth > 768 ? 3 : 1;
+
+        function initReviewsCarousel() {
+            const carousel = document.getElementById('reviewsCarousel');
+            if (!carousel) return;
+
+            const cards = carousel.querySelectorAll('.review-card');
+            const dotsContainer = document.getElementById('reviewsDots');
+            const totalSlides = Math.ceil(cards.length / reviewsPerView);
+
+            // Create dots
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                dot.onclick = () => goToReviewSlide(i);
+                dotsContainer.appendChild(dot);
+            }
+
+            // Auto-rotate
+            setInterval(() => {
+                nextReviewSlide();
+            }, 5000);
+        }
+
+        function goToReviewSlide(index) {
+            const carousel = document.getElementById('reviewsCarousel');
+            const cards = carousel.querySelectorAll('.review-card');
+            const totalSlides = Math.ceil(cards.length / reviewsPerView);
+
+            currentReviewIndex = index;
+            if (currentReviewIndex < 0) currentReviewIndex = totalSlides - 1;
+            if (currentReviewIndex >= totalSlides) currentReviewIndex = 0;
+
+            const scrollAmount = currentReviewIndex * (cards[0].offsetWidth + 30) * reviewsPerView;
+            carousel.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+
+            updateReviewDots();
+        }
+
+        function nextReviewSlide() {
+            goToReviewSlide(currentReviewIndex + 1);
+        }
+
+        function prevReviewSlide() {
+            goToReviewSlide(currentReviewIndex - 1);
+        }
+
+        function updateReviewDots() {
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentReviewIndex);
+            });
+        }
+
+        document.getElementById('reviewsNext')?.addEventListener('click', nextReviewSlide);
+        document.getElementById('reviewsPrev')?.addEventListener('click', prevReviewSlide);
+
+        // Delete Review (Admin)
+        function deleteReview(reviewId) {
+            if (!confirm('Are you sure you want to delete this review?')) return;
+
+            fetch('/Home/DeleteReview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ id: reviewId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector(`[data-review-id="${reviewId}"]`).remove();
+                    location.reload();
+                } else {
+                    alert('Failed to delete review');
+                }
+            });
+        }
+
+        // Smooth scroll to review form
+        document.querySelectorAll('a[href="#reviewFormSection"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('reviewFormSection').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initReviewsCarousel);
+    </script>
+
+}

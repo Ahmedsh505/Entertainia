@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Enable Two-Factor Authentication";
+}
+
+<link rel="stylesheet" href="~/css/Account/Enable2FA.css" asp-append-version="true" />
+
+<div class="auth-container">
+    <div class="auth-card shadow">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h1 class="auth-title">Enable Two-Factor Authentication</h1>
+            <p class="auth-subtitle">Protect your account with an extra security layer</p>
+        </div>
+
+        <div class="auth-body">
+
+            <div class="alert alert-custom">
+                <h5 class="fw-bold mb-2">How it works:</h5>
+                <ol>
+                    <li>Click the button below to receive a verification code.</li>
+                    <li>Check your email for the 6-digit code.</li>
+                    <li>Enter the code to enable 2FA.</li>
+                </ol>
+            </div>
+
+            <form asp-action="SendEnable2FACode" method="post">
+                <button type="submit" class="btn btn-auth w-100">Send Verification Code</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a asp-controller="Users" asp-action="MyProfile" class="auth-link">Cancel</a>
+            </div>
+
+        </div>
+    </div>
+</div>

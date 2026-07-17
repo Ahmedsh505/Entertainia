@@ -1,0 +1,46 @@
+﻿@using Core.Models.EventModels
+@model TheaterPlay
+
+@if (Model != null)
+{
+    <div class="info-card fade-in">
+        <div class="card-header-custom">
+            <h3 class="section-title">
+                <i class="fas fa-theater-masks"></i>
+                Theater Play Details
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-film"></i>
+                    Director
+                </div>
+                <div class="info-content">@Model.Director</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-user-friends"></i>
+                    Actors List
+                </div>
+                <div class="info-content">@Model.ActorsList</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-clock"></i>
+                    Duration
+                </div>
+                <div class="info-content">@Model.DurationMinutes minutes</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fas fa-theater-masks"></i>
+        <p>No theater play details available</p>
+    </div>
+}

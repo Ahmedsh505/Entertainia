@@ -1,0 +1,82 @@
+﻿/* ===========================================
+   LIGHT EGYPTIAN THEME + GOLD
+   Account Rejected Page - Larger Fonts
+   =========================================== */
+
+:root {
+    --color-bg-elevated: #ffffff;
+    --color-text-primary: #0b2235;
+    --color-text-secondary: #3b4f61;
+    --color-accent-start: #C59D3B;
+    --color-accent-end: #E0B95A;
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --radius-md: 12px;
+    --radius-lg: 22px;
+    --shadow-soft: 0 4px 14px rgba(0,0,0,0.08);
+    --shadow-glow: 0 0 12px rgba(197, 157, 59, 0.25);
+}
+
+/* Page container */
+.text-center {
+    max-width: 650px;
+    margin: 80px auto 0 auto;
+    padding: 40px 25px;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Heading */
+h2 {
+    font-weight: 900;
+    font-size: 38px; /* أكبر حجم */
+    color: #dc3545; /* Bootstrap danger red */
+    margin-bottom: 25px;
+}
+
+/* Paragraphs */
+p {
+    font-size: 22px; /* أكبر حجم */
+    color: var(--color-text-primary);
+    margin-top: 18px;
+    line-height: 1.6;
+}
+/* Button */
+.btn-outline-primary {
+    border: 2px solid var(--color-accent-start);
+    color: var(--color-accent-start);
+    font-weight: 700;
+    font-size: 18px; /* أكبر حجم */
+    border-radius: var(--radius-md);
+    padding: 14px 22px; /* أكبر padding */
+    transition: 0.25s;
+    margin-top: 25px;
+}
+
+    .btn-outline-primary:hover {
+        background: var(--gradient-primary);
+        color: #fff;
+        border-color: transparent;
+        transform: translateY(-2px);
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .text-center {
+        margin: 60px 15px;
+        padding: 30px 20px;
+    }
+
+    h2 {
+        font-size: 28px;
+    }
+
+    p {
+        font-size: 16px;
+    }
+
+    .btn-outline-primary {
+        font-size: 16px;
+        padding: 12px 18px;
+    }
+}

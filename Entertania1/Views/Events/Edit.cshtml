@@ -1,0 +1,325 @@
+﻿@model Entertania1.ViewModels.Event.EventCreateVM
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Events/EventEdit.css" />
+}
+
+<div class="container mt-4">
+    <h2><i class="fas fa-edit"></i> Edit Event</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" id="eventForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Event.EventId" />
+
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="fas fa-info-circle"></i> Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="Event.Title" class="form-label fw-bold">Event Title</label>
+                            <input asp-for="Event.Title" class="form-control" />
+                            <span asp-validation-for="Event.Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Event.Description" class="form-label fw-bold">Description</label>
+                            <textarea asp-for="Event.Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Event.Description" class="text-danger"></span>
+                        </div>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">Organizer</label>
+                                <select asp-for="Event.OrganizerId"
+                                        asp-items="@(new SelectList(Model.Organizers, "Id", "FirstName"))"
+                                        class="form-control">
+                                    <option value="">-- Select Organizer --</option>
+                                </select>
+                                <span asp-validation-for="Event.OrganizerId" class="text-danger"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="Event.OrganizerId" />
+                        }
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Venue</label>
+                            <select asp-for="Event.VenueId"
+                                    asp-items="@(new SelectList(Model.Venues, "VenueId", "Name"))"
+                                    class="form-control">
+                                <option value="">-- Select Venue --</option>
+                            </select>
+                            <span asp-validation-for="Event.VenueId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Event.StartDate" class="form-label fw-bold">Start Date</label>
+                                <input asp-for="Event.StartDate" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Event.StartDate" class="text-danger"></span>
+                                <small class="text-muted">Select a future date and time</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Event.EndDate" class="form-label fw-bold">End Date</label>
+                                <input asp-for="Event.EndDate" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Event.EndDate" class="text-danger"></span>
+                                <small class="text-muted">Must be after start date</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Event Price</label>
+                            <div class="input-group">
+                                <input asp-for="Event.Price" class="form-control" type="number" step="0.01" min="0.01" placeholder="Enter price" />
+                                <select asp-for="Event.Currency" class="form-select" style="max-width: 120px;">
+                                    <option value="0">EGP</option>
+                                    <option value="1">USD</option>
+                                    <option value="2">EUR</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="Event.Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">Category</label>
+                            <select id="categorySelect" asp-for="Event.Category" class="form-control">
+                                <option value="">-- Select Category --</option>
+                                <option value="Concert">Concert</option>
+                                <option value="SportEvent">Sport Event</option>
+                                <option value="TheaterPlay">Theater Play</option>
+                                <option value="CulturalEvent">Cultural Event</option>
+                                <option value="TourismActivity">Tourism Activity</option>
+                            </select>
+                            <span asp-validation-for="Event.Category" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subEventContainer"></div>
+
+                @* Current Photos *@
+                @if (ViewBag.Photos != null && ((List<Core.Models.PhotoModels.EventPhoto>)ViewBag.Photos).Any())
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h5><i class="fas fa-images"></i> Current Photos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                @foreach (var photo in (List<Core.Models.PhotoModels.EventPhoto>)ViewBag.Photos)
+                                {
+                                    <div class="col-md-3">
+                                        <div class="photo-item" data-photo-id="@photo.EventPhotoId">
+                                            <img src="@photo.FilePath" class="img-fluid rounded mb-2" alt="Event Photo" />
+                                            <div class="d-flex flex-column gap-2">
+                                                @if (photo.IsPrimary)
+                                                {
+                                                    <span class="badge">Cover Photo</span>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-success"
+                                                            onclick="setPrimary(@Model.Event.EventId, @photo.EventPhotoId)">
+                                                        Set as Cover
+                                                    </button>
+                                                }
+                                                <button type="button" class="btn btn-sm"
+                                                        onclick="deletePhoto(@photo.EventPhotoId)">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Current Videos *@
+                @if (ViewBag.Videos != null && ((List<Core.Models.VideoModels.EventVideo>)ViewBag.Videos).Any())
+                {
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h5><i class="fas fa-video"></i> Current Videos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                @foreach (var video in (List<Core.Models.VideoModels.EventVideo>)ViewBag.Videos)
+                                {
+                                    <div class="col-md-4">
+                                        <div class="video-item" data-video-id="@video.EventVideoId">
+                                            <video controls class="w-100 mb-2">
+                                                <source src="@video.FilePath" type="@video.ContentType">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <div class="d-flex flex-column gap-2">
+                                                <small class="text-muted">@video.OriginalFileName</small>
+                                                <button type="button" class="btn btn-sm"
+                                                        onclick="deleteVideo(@video.EventVideoId)">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @* Upload New Media *@
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="fas fa-photo-video"></i> Upload New Media</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-images"></i> Photos</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Upload up to 10 photos. First photo will be the cover photo.
+                            </div>
+
+                            <input type="file"
+                                   name="photos"
+                                   id="photoInput"
+                                   accept="image/jpeg,image/png,image/webp,image/gif,image/bmp"
+                                   multiple
+                                   class="form-control" />
+
+                            <small class="text-muted">
+                                Supported formats: JPG, PNG, WEBP, GIF, BMP (Max 20 MB each)
+                            </small>
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold mb-3"><i class="fas fa-video"></i> Videos</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Upload up to 5 videos to showcase your event.
+                            </div>
+
+                            <input type="file"
+                                   name="videos"
+                                   id="videoInput"
+                                   accept="video/mp4,video/webm,video/mov,video/mkv,video/avi"
+                                   multiple
+                                   class="form-control" />
+
+                            <small class="text-muted">
+                                Supported formats: MP4, WEBM, MOV, MKV, AVI (Max 250 MB each)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                @* Discount Codes *@
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-tag"></i> Discount Codes (Optional)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="discountCodesContainer">
+                            @if (Model.DiscountCodes != null && Model.DiscountCodes.Any())
+                            {
+                                for (int i = 0; i < Model.DiscountCodes.Count; i++)
+                                {
+                                    <div class="discount-code-item border p-3 mb-3 rounded bg-light">
+                                        <input type="hidden" asp-for="DiscountCodes[i].DiscountCodeId" />
+                                        <div class="row">
+                                            <div class="col-md-3 mb-2">
+                                                <label class="form-label">Code <span class="text-danger">*</span></label>
+                                                <input asp-for="DiscountCodes[i].Code" class="form-control" placeholder="SAVE20" required />
+                                                <span asp-validation-for="DiscountCodes[i].Code" class="text-danger"></span>
+                                            </div>
+                                            <div class="col-md-2 mb-2">
+                                                <label class="form-label">Type</label>
+                                                <select asp-for="DiscountCodes[i].DiscountType" class="form-control">
+                                                    <option value="0">Percentage</option>
+                                                    <option value="1">Fixed Amount</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 mb-2">
+                                                <label class="form-label">Value <span class="text-danger">*</span></label>
+                                                <input asp-for="DiscountCodes[i].DiscountValue" class="form-control" type="number" step="0.01" min="0.01" placeholder="20" required />
+                                                <span asp-validation-for="DiscountCodes[i].DiscountValue" class="text-danger"></span>
+                                            </div>
+                                            <div class="col-md-2 mb-2">
+                                                <label class="form-label">Valid From</label>
+                                                <input asp-for="DiscountCodes[i].ValidFrom" class="form-control" type="datetime-local" />
+                                            </div>
+                                            <div class="col-md-2 mb-2">
+                                                <label class="form-label">Valid Until</label>
+                                                <input asp-for="DiscountCodes[i].ValidUntil" class="form-control" type="datetime-local" />
+                                            </div>
+                                            <div class="col-md-1 mb-2 d-flex align-items-end">
+                                                <button type="button" class="btn btn-sm w-100" onclick="removeDiscountCode(this)" title="Remove">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3 mb-2">
+                                                <label class="form-label">Max Usage</label>
+                                                <input asp-for="DiscountCodes[i].MaxUsageCount" class="form-control" type="number" min="1" placeholder="Unlimited" />
+                                                <small class="text-muted">Leave blank for unlimited</small>
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <div class="form-check mt-4">
+                                                    <input asp-for="DiscountCodes[i].IsActive" class="form-check-input" type="checkbox" value="true" />
+                                                    <label asp-for="DiscountCodes[i].IsActive" class="form-check-label">Is Active</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="addDiscountCode()">
+                            <i class="fas fa-plus"></i> Add Discount Code
+                        </button>
+
+                        <div class="alert alert-info mt-3">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Discount Types:</strong>
+                                <ul class="mb-0">
+                                    <li><strong>Percentage:</strong> Enter value like 20 for 20% off</li>
+                                    <li><strong>Fixed Amount:</strong> Enter value like 50 for 50 EGP/USD/EUR off</li>
+                                </ul>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/EventEdit.js"></script>
+}

@@ -1,0 +1,247 @@
+﻿/* ============================================================
+   BOOK EVENT PAGE — FULL CSS
+   Combined File
+============================================================ */
+:root {
+    --color-bg-base: #FBFAF7; /* Off-white base */
+    --color-bg-elevated: #FFFFFF; /* Cards / navbar bg */
+    --color-text-primary: #0b2235; /* Dark Egyptian Blue (text) */
+    --color-text-secondary: #3b4f61; /* secondary text */
+    --color-border: #e6e2db;
+    --color-accent-start: #C59D3B; /* Gold start */
+    --color-accent-end: #E0B95A; /* Gold end */
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --gradient-accent: linear-gradient(90deg,#0b3b6b,#1e5aa6); /* subtle royal blue gradient */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 6px rgba(11,34,53,0.06);
+    --shadow-lg: 0 12px 30px rgba(11,34,53,0.10);
+    --shadow-glow: 0 8px 30px rgba(197,157,59,0.12);
+    --transition-base: 200ms ease;
+    --transition-fast: 120ms ease;
+}
+
+body {
+    background: #fafafa !important;
+}
+
+.container {
+    padding: 20px !important;
+}
+
+/* ============================================================
+   CARD STYLING
+============================================================ */
+.card {
+    border-radius: var(--radius) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--shadow) !important;
+    background: var(--color-card) !important;
+}
+
+.card-header {
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    padding: 15px 20px !important;
+}
+
+.card-body {
+    padding: 20px !important;
+}
+
+    /* ============================================================
+   BOOKING FORM — MAIN CONTENT
+============================================================ */
+    .card-body h4 {
+        font-size: 26px !important;
+        font-weight: 700 !important;
+        color: var(--color-text) !important;
+    }
+
+.text-muted i {
+    color: var(--color-primary) !important;
+}
+
+/* Ticket tier selection */
+.tier-option {
+    cursor: pointer !important;
+    border-radius: var(--radius) !important;
+    transition: all 0.25s ease-in-out !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+    .tier-option:hover {
+        box-shadow: 0 3px 10px rgba(0,0,0,0.12) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    .tier-option.border-primary {
+        border-width: 2px !important;
+        box-shadow: 0 0 0 3px rgba(13,110,253,0.2) !important;
+    }
+
+    .tier-option input[type="radio"] {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+/* Number of tickets */
+.form-label {
+    font-weight: 700 !important;
+    margin-bottom: 5px !important;
+}
+
+.form-control {
+    padding: 10px 12px !important;
+    border-radius: var(--radius) !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+    .form-control:focus {
+        border-color: var(--color-primary) !important;
+        box-shadow: 0 0 0 3px rgba(13,110,253,0.15) !important;
+    }
+
+/* Discount code input */
+.input-group .form-control {
+    border-radius: var(--radius) 0 0 var(--radius) !important;
+}
+
+.input-group .btn {
+    border-radius: 0 var(--radius) var(--radius) 0 !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+}
+
+#discountMessage .alert {
+    border-radius: var(--radius) !important;
+    margin-top: 10px !important;
+}
+
+/* Price summary */
+.card-title {
+    font-weight: 700 !important;
+}
+
+.table td {
+    padding: 6px 4px !important;
+    font-size: 15px !important;
+}
+
+#total {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-radius: var(--radius) !important;
+    padding: 10px 14px !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important;
+    }
+
+.btn-outline-secondary {
+    border-radius: var(--radius) !important;
+    padding: 10px 14px !important;
+    font-size: 16px !important;
+}
+
+/* ============================================================
+   SIDEBAR — EVENT INFORMATION
+============================================================ */
+.card-header.bg-info {
+    background-color: var(--color-info) !important;
+}
+
+.card-body p {
+    margin-bottom: 10px !important;
+    font-size: 15px !important;
+}
+
+.alert-info {
+    background-color: rgba(13,202,240,0.15) !important;
+    border-color: rgba(13,202,240,0.3) !important;
+    border-radius: var(--radius) !important;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+    h4 {
+        font-size: 22px !important;
+    }
+
+    #total {
+        font-size: 18px !important;
+    }
+
+    .tier-option {
+        padding: 10px !important;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Added selectors matching the page structure (no functional changes)
+------------------------------------------------------------------ */
+
+.card {
+    background: var(--color-bg-elevated) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+.card-header {
+    background: var(--gradient-accent) !important;
+    color: #fff !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+}
+
+.btn-primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: var(--shadow-glow) !important;
+}
+
+.btn-outline-secondary {
+    border-color: var(--color-border) !important;
+    color: var(--color-text-secondary) !important;
+}
+
+.tier-option {
+    border-radius: var(--radius-md) !important;
+    background: var(--color-bg-elevated) !important;
+    border: 1px solid var(--color-border) !important;
+    transition: var(--transition-base) !important;
+}
+
+    .tier-option:hover {
+        box-shadow: var(--shadow-sm) !important;
+        transform: translateY(-2px) !important;
+    }
+
+.border-primary {
+    border-color: var(--color-accent-start) !important;
+}
+
+.form-control {
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(197,157,59,0.2) !important;
+        border-color: var(--color-accent-start) !important;
+    }
+
+.table td {
+    color: var(--color-text-primary) !important;
+}

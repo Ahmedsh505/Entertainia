@@ -1,0 +1,284 @@
+﻿@model Entertania1.ViewModels.Book.BookEventViewModel
+
+@{
+    ViewData["Title"] = "Book Event";
+}
+<link rel="stylesheet" href="~/css/Booking/Book.css" />
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-ticket-alt"></i> Book Tickets</h3>
+                </div>
+                <div class="card-body">
+                    <h4>@Model.EventName</h4>
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt"></i> @Model.VenueName
+                    </p>
+
+                    <form asp-action="Book" method="post" id="bookingForm">
+                        <input type="hidden" asp-for="EventId" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="DiscountAmount" id="discountAmountHidden" />
+
+                        <!-- Ticket Tier Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Ticket Tier</label>
+                            @foreach (var tier in Model.AvailableTiers)
+                            {
+                                <div class="card mb-2 tier-option @(tier.Tier == Model.SelectedTier ? "border-primary" : "")"
+                                     onclick="selectTier('@tier.Tier', @tier.Price)">
+                                    <div class="card-body p-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-1">
+                                                <input type="radio"
+                                                       asp-for="SelectedTier"
+                                                       value="@tier.Tier"
+                                                       id="tier_@tier.Tier"
+                                                       checked="@(tier.Tier == Model.SelectedTier)" />
+                                            </div>
+                                            <div class="col-7">
+                                                <h5 class="mb-0">@tier.Name</h5>
+                                                <small class="text-muted">@tier.AvailableSeats seats available</small>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <h4 class="mb-0 text-primary">
+                                                    @tier.Price.ToString("N2") @Model.Currency
+                                                </h4>
+                                                @if (Model.Currency != Core.Enums.Currency.EGP && Model.EstimatedPriceInEGP.HasValue)
+                                                {
+                                                    var estimatedTierPrice = Model.EstimatedPriceInEGP.Value * tier.PriceMultiplier;
+                                                    <small class="text-muted">≈ @estimatedTierPrice.ToString("N2") EGP</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Number of Tickets -->
+                        <div class="mb-3">
+                            <label asp-for="NumberOfTickets" class="form-label fw-bold">Number of Tickets</label>
+                            <input asp-for="NumberOfTickets"
+                                   class="form-control"
+                                   type="number"
+                                   min="1"
+                                   max="100"
+                                   value="1"
+                                   onchange="calculateTotal()" />
+                            <span asp-validation-for="NumberOfTickets" class="text-danger"></span>
+                        </div>
+
+                        <!-- Discount Code -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Discount Code (Optional)</label>
+                            <div class="input-group">
+                                <input asp-for="DiscountCode"
+                                       class="form-control"
+                                       placeholder="Enter discount code"
+                                       id="discountCodeInput" />
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="applyDiscountCode()">
+                                    Apply
+                                </button>
+                            </div>
+                            <div id="discountMessage" class="mt-2"></div>
+                        </div>
+
+                        <!-- Price Summary -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Price Summary</h5>
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr>
+                                        <td>Subtotal:</td>
+                                        <td class="text-end" id="subtotal">@Model.PricePerTicket.ToString("N2") @Model.Currency</td>
+                                    </tr>
+                                    <tr id="discountRow" style="display:none;">
+                                        <td class="text-success">Discount:</td>
+                                        <td class="text-end text-success" id="discount">-0.00 @Model.Currency</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tax (14%):</td>
+                                        <td class="text-end" id="tax">@((Model.PricePerTicket * 0.14m).ToString("N2")) @Model.Currency</td>
+                                    </tr>
+                                    <tr class="fw-bold border-top">
+                                        <td>Total:</td>
+                                        <td class="text-end text-primary" id="total">
+                                            @((Model.PricePerTicket * 1.14m).ToString("N2")) @Model.Currency
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-credit-card"></i> Proceed to Payment
+                            </button>
+                            <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Info Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-info-circle"></i> Event Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Venue:</strong> @Model.VenueName</p>
+                    <p><strong>Capacity:</strong> @Model.VenueCapacity</p>
+                    <p><strong>Base Price:</strong> @Model.BasePricePerTicket.ToString("N2") @Model.Currency</p>
+
+                    @if (Model.Currency != Core.Enums.Currency.EGP && Model.EstimatedPriceInEGP.HasValue)
+                    {
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-exchange-alt"></i>
+                                Estimated price: <strong>@Model.EstimatedPriceInEGP.Value.ToString("N2") EGP</strong>
+                            </small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPrice = @Model.PricePerTicket;
+        let currentDiscountPercentage = 0;
+        let currentDiscountAmount = 0;
+        const currency = '@Model.Currency';
+        const eventId = @Model.EventId;
+
+        function selectTier(tierName, price) {
+            document.getElementById('tier_' + tierName).checked = true;
+            currentPrice = price;
+            calculateTotal();
+            // Highlight selected tier
+            document.querySelectorAll('.tier-option').forEach(el => {
+                el.classList.remove('border-primary');
+            });
+            event.currentTarget.classList.add('border-primary');
+        }
+
+        function calculateTotal() {
+            const tickets = parseInt(document.getElementById('NumberOfTickets').value) || 1;
+            const subtotal = currentPrice * tickets;
+
+            // Calculate discount based on percentage or fixed amount per ticket
+            let totalDiscount = 0;
+            if (currentDiscountPercentage > 0) {
+                totalDiscount = subtotal * (currentDiscountPercentage / 100);
+            } else if (currentDiscountAmount > 0) {
+                totalDiscount = currentDiscountAmount * tickets;
+            }
+
+            const afterDiscount = subtotal - totalDiscount;
+            const tax = afterDiscount * 0.14;
+            const total = afterDiscount + tax;
+
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ' + currency;
+            document.getElementById('tax').textContent = tax.toFixed(2) + ' ' + currency;
+            document.getElementById('total').textContent = total.toFixed(2) + ' ' + currency;
+
+            if (totalDiscount > 0) {
+                document.getElementById('discountRow').style.display = '';
+                document.getElementById('discount').textContent = '-' + totalDiscount.toFixed(2) + ' ' + currency;
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+            }
+        }
+
+        async function applyDiscountCode() {
+            const code = document.getElementById('discountCodeInput').value.trim();
+            if (!code) {
+                showMessage('Please enter a discount code', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/Booking/ApplyDiscountCode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ eventId: eventId, discountCode: code })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Store discount info based on type (percentage or fixed amount)
+                    if (result.discountType === 'percentage') {
+                        currentDiscountPercentage = result.discountValue;
+                        currentDiscountAmount = 0;
+                    } else {
+                        currentDiscountAmount = result.discountAmount;
+                        currentDiscountPercentage = 0;
+                    }
+
+                    // Calculate total discount for current number of tickets
+                    const tickets = parseInt(document.getElementById('NumberOfTickets').value) || 1;
+                    const subtotal = currentPrice * tickets;
+                    let totalDiscount = 0;
+
+                    if (currentDiscountPercentage > 0) {
+                        totalDiscount = subtotal * (currentDiscountPercentage / 100);
+                    } else {
+                        totalDiscount = currentDiscountAmount * tickets;
+                    }
+
+                    document.getElementById('discountAmountHidden').value = totalDiscount;
+                    calculateTotal();
+
+                    // Show updated message with actual discount amount
+                    showMessage(`Discount applied! You saved ${totalDiscount.toFixed(2)} ${currency}`, 'success');
+                } else {
+                    showMessage(result.message, 'danger');
+                }
+            } catch (error) {
+                showMessage('Error applying discount code', 'danger');
+            }
+        }
+
+        function showMessage(message, type) {
+            const msgDiv = document.getElementById('discountMessage');
+            msgDiv.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
+        }
+
+        // Initialize
+        calculateTotal();
+
+        // Recalculate when number of tickets changes
+        document.getElementById('NumberOfTickets')?.addEventListener('change', calculateTotal);
+    </script>
+}
+
+<style>
+    .tier-option {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .tier-option:hover {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+</style>

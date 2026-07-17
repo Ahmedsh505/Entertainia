@@ -1,0 +1,563 @@
+﻿@model Entertania1.ViewModels.Event.EventCreateVM
+@using Core.Enums
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Event Details";
+    var venueCapacity = Model.Event.Venue?.Capacity ?? 0;
+    var bookedSeats = Model.Event.Bookings?
+        .Where(b => b.Status != "Cancelled")
+        .Sum(b => b.NumberOfTickets) ?? 0;
+    var availableSeats = venueCapacity - bookedSeats;
+    var seatsClass = availableSeats <= 0 ? "sold-out" : availableSeats <= 10 ? "low-stock" : "available";
+    var currencySymbol = Model.Event.Currency switch
+    {
+        Currency.EGP => "EGP",
+        Currency.USD => "$",
+        Currency.EUR => "€",
+        _ => "EGP"
+    };
+    var photos = ViewBag.Photos as List<Core.Models.PhotoModels.EventPhoto> ?? new List<Core.Models.PhotoModels.EventPhoto>();
+    var videos = ViewBag.Videos as List<Core.Models.VideoModels.EventVideo> ?? new List<Core.Models.VideoModels.EventVideo>();
+    var hasMedia = photos.Any() || videos.Any();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Events/EventDetails.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+}
+
+<!-- Immersive Hero Gallery Banner -->
+<section class="event-hero-gallery" id="heroGallery">
+    @if (hasMedia)
+    {
+        <!-- Media Display Container -->
+        <div class="hero-media-display">
+            <div class="hero-media-viewport" id="heroMediaViewport">
+                <!-- Media injected by JS -->
+            </div>
+
+            <!-- Side Thumbnails Strip -->
+            <div class="hero-thumbnails-strip" id="heroThumbnailsStrip">
+                <div class="thumbnails-scroll">
+                    @for (int i = 0; i < photos.Count; i++)
+                    {
+                        var photo = photos[i];
+                        <div class="thumb-item @(i == 0 ? "active" : "")"
+                             data-index="@i"
+                             onclick="selectMedia(@i)">
+                            <img src="@photo.FilePath" alt="@Model.Event.Title" loading="lazy">
+                            @if (photo.IsPrimary)
+                            {
+                                <span class="thumb-badge"><i class="fas fa-star"></i></span>
+                            }
+                        </div>
+                    }
+                    @for (int i = 0; i < videos.Count; i++)
+                    {
+                        var video = videos[i];
+                        var mediaIndex = photos.Count + i;
+                        <div class="thumb-item"
+                             data-index="@mediaIndex"
+                             onclick="selectMedia(@mediaIndex)">
+                            <video preload="metadata">
+                                <source src="@video.FilePath" type="@(video.ContentType ?? "video/mp4")">
+                            </video>
+                            <span class="thumb-video-icon"><i class="fas fa-play-circle"></i></span>
+                            @if (video.IsPrimary)
+                            {
+                                <span class="thumb-badge"><i class="fas fa-star"></i></span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <button class="nav-btn prev" onclick="navigateMedia(-1)" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="nav-btn next" onclick="navigateMedia(1)" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Control Buttons -->
+            <div class="media-controls">
+                <button class="control-btn" id="playPauseBtn" onclick="toggleAutoplay()" aria-label="Pause">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button class="control-btn" onclick="toggleFullscreen()" aria-label="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Media Counter -->
+            <div class="media-counter">
+                <span id="currentNum">1</span> / <span id="totalNum">@(photos.Count + videos.Count)</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Fallback Gradient -->
+        <div class="hero-media-display">
+            <div class="hero-fallback"></div>
+        </div>
+    }
+
+    <!-- Info Overlay (Bottom 25%) -->
+    <div class="hero-info-overlay">
+        <div class="container">
+
+            <!-- Title -->
+            <h1 class="event-title">@Model.Event.Title</h1>
+
+            <!-- Badges Row -->
+            <div class="badges-row">
+                <span class="badge badge-category">
+                    <i class="fas fa-tag"></i>
+                    @Model.Event.Category
+                </span>
+                <span class="badge badge-price">
+                    <i class="fas fa-ticket-alt"></i>
+                    @Model.Event.Price.ToString("N2") @currencySymbol
+                </span>
+                <span class="badge badge-seats @seatsClass">
+                    <i class="fas fa-chair"></i>
+                    @availableSeats/@venueCapacity Seats
+                </span>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="quick-info-grid">
+                <div class="info-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <span class="label">Start Date</span>
+                        <span class="value">@Model.Event.StartDate.ToString("MMM dd, yyyy • hh:mm tt")</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <span class="label">Venue</span>
+                        <span class="value">@Model.Event.Venue?.Name</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user-tie"></i>
+                    <div>
+                        <span class="label">Organizer</span>
+                        <span class="value">@Model.Event.Organizer?.FirstName @Model.Event.Organizer?.LastName</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Customer") && availableSeats > 0)
+            {
+                <div class="cta-wrapper">
+                    <a asp-controller="Booking" asp-action="Book" asp-route-eventId="@Model.Event.EventId"
+                       class="btn-book-now">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Book Tickets Now</span>
+                    </a>
+                </div>
+            }
+            else if (availableSeats <= 0)
+            {
+                <div class="cta-wrapper">
+                    <button class="btn-sold-out" disabled>
+                        <i class="fas fa-times-circle"></i>
+                        <span>Sold Out</span>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Sticky Book Button -->
+@if (User.Identity.IsAuthenticated && User.IsInRole("Customer") && availableSeats > 0)
+{
+    <div class="sticky-book-bar" id="stickyBookBar">
+        <div class="container">
+            <div class="sticky-content">
+                <div class="sticky-info">
+                    <span class="sticky-title">@Model.Event.Title</span>
+                    <span class="sticky-price">@Model.Event.Price.ToString("N2") @currencySymbol</span>
+                </div>
+                <a asp-controller="Booking" asp-action="Book" asp-route-eventId="@Model.Event.EventId"
+                   class="btn-sticky-book">
+                    <i class="fas fa-ticket-alt"></i>
+                    Book Now
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Main Content -->
+<div class="event-content">
+    <div class="container">
+        <div class="content-grid">
+
+            <!-- Left Column -->
+            <div class="content-main">
+
+                <!-- Description -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-info-circle"></i>
+                            About This Event
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="description-text">@Model.Event.Description</p>
+                    </div>
+                </div>
+
+                <!-- Schedule -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-clock"></i>
+                            Event Schedule
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Event Starts</h4>
+                                    <p class="date">@Model.Event.StartDate.ToString("MMMM dd, yyyy")</p>
+                                    <p class="time">@Model.Event.StartDate.ToString("hh:mm tt")</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-stop-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Event Ends</h4>
+                                    <p class="date">@Model.Event.EndDate.ToString("MMMM dd, yyyy")</p>
+                                    <p class="time">@Model.Event.EndDate.ToString("hh:mm tt")</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="duration-badge">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>Duration: <strong>@((Model.Event.EndDate - Model.Event.StartDate).TotalHours.ToString("F1")) hours</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Tiers -->
+                @if (ViewBag.TicketTiers != null && ((IEnumerable<dynamic>)ViewBag.TicketTiers).Any())
+                {
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-layer-group"></i>
+                                Ticket Options
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="tiers-grid">
+                                @foreach (var tier in ViewBag.TicketTiers)
+                                {
+                                    <div class="tier-card">
+                                        <div class="tier-icon">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <h3 class="tier-name">@tier.GetTierName()</h3>
+                                        <div class="tier-price">
+                                            <span class="amount">@tier.GetPrice(Model.Event.Price).ToString("N2")</span>
+                                            <span class="currency">@currencySymbol</span>
+                                        </div>
+                                        <div class="tier-seats">
+                                            <i class="fas fa-chair"></i>
+                                            <span>@tier.AvailableSeats available</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Discount Codes (Admin/Organizer) -->
+                @if (User.IsInRole("Admin") || (User.IsInRole("Organizer") && Model.Event.OrganizerId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                {
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-percent"></i>
+                                Discount Codes
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            @if (ViewBag.DiscountCodes != null && ((IEnumerable<Core.Models.DiscountCode>)ViewBag.DiscountCodes).Any())
+                            {
+                                <div class="discount-list">
+                                    @foreach (var code in ViewBag.DiscountCodes)
+                                    {
+                                        <div class="discount-card">
+                                            <div class="discount-header">
+                                                <code>@code.Code</code>
+                                                @if (code.IsActive)
+                                                {
+                                                    <span class="status active">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status inactive">Inactive</span>
+                                                }
+                                            </div>
+                                            <div class="discount-details">
+                                                <div class="detail-item">
+                                                    <span class="label">Type:</span>
+                                                    <span class="value">@code.DiscountType</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <span class="label">Value:</span>
+                                                    <span class="value">@code.DiscountValue</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <span class="label">Usage:</span>
+                                                    <span class="value">@code.CurrentUsageCount / @(code.MaxUsageCount?.ToString() ?? "∞")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No discount codes available</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Sub-Event Container -->
+                <div id="subEventContainer"></div>
+
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="content-sidebar">
+
+                <!-- Availability -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Availability
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <span class="stat-label">Total</span>
+                                <span class="stat-value">@venueCapacity</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Booked</span>
+                                <span class="stat-value booked">@bookedSeats</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Available</span>
+                                <span class="stat-value available">@availableSeats</span>
+                            </div>
+                        </div>
+                        <div class="availability-bar">
+                            <div class="availability-fill"
+                                 style="width: @((venueCapacity == 0 ? 0 : (bookedSeats * 100.0 / venueCapacity)))%">
+                            </div>
+                        </div>
+                        @if (availableSeats <= 0)
+                        {
+                            <div class="availability-alert sold-out">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Event is sold out!</span>
+                            </div>
+                        }
+                        else if (availableSeats <= 10)
+                        {
+                            <div class="availability-alert low-stock">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Only @availableSeats tickets left!</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="availability-alert available">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Tickets available</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Venue Map -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-map-marked-alt"></i>
+                            Venue Location
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Event.Venue != null && Model.Event.Venue.Latitude.HasValue && Model.Event.Venue.Longitude.HasValue)
+                        {
+                            <div class="venue-info">
+                                <div class="venue-item">
+                                    <i class="fas fa-building"></i>
+                                    <span>@Model.Event.Venue.Name</span>
+                                </div>
+                                <div class="venue-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>@Model.Event.Venue.Location</span>
+                                </div>
+                                @if (Model.Event.Venue.Governorate != null)
+                                {
+                                    <div class="venue-item">
+                                        <i class="fas fa-map-pin"></i>
+                                        <span>@Model.Event.Venue.Governorate</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="map-wrapper">
+                                <div id="venueMap" class="venue-map"></div>
+                            </div>
+                            <button class="btn-directions" id="directionsBtn">
+                                <i class="fas fa-route"></i>
+                                Get Directions
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <p>Location unavailable</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Share -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-share-nodes"></i>
+                            Share Event
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="share-grid">
+                            <button class="share-btn facebook" onclick="shareEvent('facebook')">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="share-btn twitter" onclick="shareEvent('twitter')">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button class="share-btn whatsapp" onclick="shareEvent('whatsapp')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="share-btn link" onclick="copyLink()">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-btns">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Event.EventId" class="btn-action edit">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit Event</span>
+                </a>
+            }
+            @if (User.IsInRole("Organizer"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Event.EventId" class="btn-action edit">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit Event</span>
+                </a>
+            }
+            <a asp-action="Index" class="btn-action back">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Events</span>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Fullscreen Modal -->
+<div class="fullscreen-modal" id="fullscreenModal" onclick="closeFullscreen()">
+    <button class="modal-close" onclick="closeFullscreen()">
+        <i class="fas fa-times"></i>
+    </button>
+    <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
+        <!-- Media injected here -->
+    </div>
+    <div class="modal-nav">
+        <button onclick="event.stopPropagation(); navigateMedia(-1);">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button onclick="event.stopPropagation(); navigateMedia(1);">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Media Data
+        const mediaItems = [
+            @foreach (var photo in photos)
+            {
+                        @:{ type: 'photo', src: '@photo.FilePath', isPrimary: @photo.IsPrimary.ToString().ToLower() },
+            }
+            @foreach (var video in videos)
+            {
+                        @:{ type: 'video', src: '@video.FilePath', contentType: '@(video.ContentType ?? "video/mp4")', isPrimary: @video.IsPrimary.ToString().ToLower() },
+            }
+        ];
+
+        // Venue Data
+        const venueData = {
+            lat: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Event.Venue?.Latitude)),
+            lng: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Event.Venue?.Longitude)),
+            name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Event.Venue?.Name)),
+            location: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Event.Venue?.Location))
+        };
+
+        // Event Data
+        const eventData = {
+            category: '@Model.Event.Category',
+            eventId: '@Model.Event.EventId'
+        };
+    </script>
+    <script src="~/js/EventDetails.js" asp-append-version="true"></script>
+}

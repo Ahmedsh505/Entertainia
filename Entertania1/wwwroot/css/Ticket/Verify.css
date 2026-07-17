@@ -1,0 +1,159 @@
+﻿/* ----------------------------------------------------
+   ROOT (Egyptian Gold + Royal Blue Theme)
+---------------------------------------------------- */
+:root {
+    --color-bg-base: #FBFAF7;
+    --color-bg-elevated: #FFFFFF;
+    --color-text-primary: #0b2235;
+    --color-text-secondary: #3b4f61;
+    --color-border: #e6e2db;
+    --color-accent-start: #C59D3B;
+    --color-accent-end: #E0B95A;
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --gradient-accent: linear-gradient(90deg,#0b3b6b,#1e5aa6);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 6px rgba(11,34,53,0.06);
+    --shadow-lg: 0 12px 30px rgba(11,34,53,0.10);
+    --shadow-glow: 0 8px 30px rgba(197,157,59,0.12);
+    --transition-base: 200ms ease;
+}
+
+
+/* ----------------------------------------------------
+   PAGE LAYOUT
+---------------------------------------------------- */
+
+body {
+    background: var(--color-bg-base) !important;
+    color: var(--color-text-primary);
+}
+
+
+/* ----------------------------------------------------
+   CARD GENERAL STYLE
+---------------------------------------------------- */
+.card {
+    border-radius: var(--radius-md) !important;
+    background: var(--color-bg-elevated) !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.card-header {
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    padding: 16px;
+}
+
+
+/* ----------------------------------------------------
+   STATUS COLORS (Valid / Invalid Card)
+---------------------------------------------------- */
+.bg-success {
+    background: linear-gradient(90deg, #1f8a4d, #28c76f) !important;
+}
+
+.bg-danger {
+    background: linear-gradient(90deg, #a71d2a, #e63946) !important;
+}
+
+
+/* ----------------------------------------------------
+   ALERT COLORS
+---------------------------------------------------- */
+.alert-success {
+    border-left: 5px solid #28c76f !important;
+    background: #eafff3 !important;
+}
+
+.alert-danger {
+    border-left: 5px solid #e63946 !important;
+    background: #ffecec !important;
+}
+
+
+/* ----------------------------------------------------
+   HEADERS FOR INNER CARDS (Ticket Details / Event Info)
+---------------------------------------------------- */
+
+.card-header.bg-primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+}
+
+.card-header.bg-info {
+    background: var(--gradient-accent) !important;
+}
+
+.card-header.bg-secondary {
+    background: #495057 !important;
+}
+
+
+/* ----------------------------------------------------
+   BADGES
+---------------------------------------------------- */
+.badge {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+    .badge.bg-info {
+        background: var(--gradient-accent) !important;
+    }
+
+.badge-pending {
+    background: #ffc107 !important;
+}
+
+.badge-used {
+    background: #28c76f !important;
+}
+
+.badge-expired {
+    background: #e63946 !important;
+}
+
+
+/* ----------------------------------------------------
+   BUTTONS
+---------------------------------------------------- */
+.btn-success {
+    background: linear-gradient(90deg, #1f8a4d, #28c76f) !important;
+    border: none !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-outline-primary {
+    border-color: var(--color-accent-start) !important;
+    color: var(--color-accent-start) !important;
+}
+
+    .btn-outline-primary:hover {
+        background: var(--gradient-primary) !important;
+        color: #fff !important;
+    }
+
+
+/* ----------------------------------------------------
+   QR CODE BOX
+---------------------------------------------------- */
+.qr-box {
+    border: 3px solid var(--color-border);
+    padding: 12px;
+    background: #fff;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* ----------------------------------------------------
+   TEXT HELPERS
+---------------------------------------------------- */
+
+.text-muted {
+    color: var(--color-text-secondary) !important;
+}
+

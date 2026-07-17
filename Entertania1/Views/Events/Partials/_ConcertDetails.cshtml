@@ -1,0 +1,46 @@
+﻿@using Core.Models.EventModels
+@model Concert
+
+@if (Model != null)
+{
+    <div class="info-card fade-in">
+        <div class="card-header-custom">
+            <h3 class="section-title">
+                <i class="fas fa-music"></i>
+                Concert Details
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-microphone"></i>
+                    Artist Name
+                </div>
+                <div class="info-content">@Model.ArtistName</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-guitar"></i>
+                    Genre
+                </div>
+                <div class="info-content">@Model.Genre</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-users"></i>
+                    Band Count
+                </div>
+                <div class="info-content">@Model.BandCount</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fas fa-music"></i>
+        <p>No concert details available</p>
+    </div>
+}

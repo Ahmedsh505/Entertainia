@@ -1,0 +1,207 @@
+﻿@model Entertania1.ViewModels.Book.CancelBookingViewModel
+@using Core.Enums
+
+@{
+    ViewData["Title"] = "Request Refund";
+}
+<link rel="stylesheet" href="~/css/Booking/Cancel.css" />
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-undo me-2"></i>Request Refund
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning border-0" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> Important Refund Information
+                        </h5>
+                        <ul class="mb-0">
+                            <li>Cancelling this booking will initiate a <strong>refund request</strong></li>
+                            <li>You will receive <strong>80% refund</strong> of the total amount paid</li>
+                            <li>20% processing fee will be deducted</li>
+                            <li>Refund requests require <strong>admin approval</strong></li>
+                            <li>Processing may take <strong>3-5 business days</strong> after approval</li>
+                            <li>Your seats will be released back to the event</li>
+                        </ul>
+                    </div>
+
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-receipt me-2 text-primary"></i>Booking Details
+                            </h5>
+                            <table class="table table-borderless mb-0">
+                                <tr>
+                                    <td class="fw-bold" style="width: 40%;">Event:</td>
+                                    <td>@Model.EventName</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Booking Date:</td>
+                                    <td>@Model.BookingDate.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Number of Tickets:</td>
+                                    <td><span class="badge bg-primary">@Model.NumberOfTickets</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Total Paid:</td>
+                                    <td class="fs-5 text-success">@Model.TotalAmount.ToString("N2") @Model.Currency</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Estimated Refund (80%):</td>
+                                    <td class="fs-5 text-primary">@((Model.TotalAmount * 0.8m).ToString("N2")) @Model.Currency</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <form asp-action="CancelConfirmed" method="post" id="refundForm">
+                        <input type="hidden" asp-for="BookingId" />
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label for="cancellationReason" class="form-label fw-bold">
+                                Reason for Refund Request <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      id="cancellationReason"
+                                      name="cancellationReason"
+                                      rows="4"
+                                      placeholder="Please provide a detailed reason for your refund request (minimum 10 characters)&#10;&#10;Example: 'I can no longer attend due to a schedule conflict' or 'The event details have changed'"
+                                      required
+                                      minlength="10"></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                This will help us improve our services and will be reviewed by our admin team.
+                            </div>
+                            <div id="charCounter" class="text-muted small mt-1"></div>
+                        </div>
+
+                        <div class="form-check mb-4 p-3 bg-light rounded">
+                            <input class="form-check-input" type="checkbox" id="confirmCancellation" required>
+                            <label class="form-check-label" for="confirmCancellation">
+                                I understand that this action will submit a refund request and I will receive
+                                <strong>80% of my payment</strong> after admin approval. The remaining 20% is a non-refundable processing fee.
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-paper-plane"></i> Submit Refund Request
+                            </button>
+                            <a asp-action="MyBookings" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Keep Booking
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Refund Policy Card -->
+            <div class="card shadow-sm mt-4 border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract"></i> Refund Policy
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold">Standard Refund Terms:</h6>
+                    <ul>
+                        <li>Refunds are processed as <strong>80%</strong> of the total paid amount</li>
+                        <li><strong>20% processing fee</strong> is retained</li>
+                        <li>Refund requests must be made <strong>before the event starts</strong></li>
+                        <li><strong>Admin approval</strong> is required for all refunds</li>
+                        <li>Refunds typically take <strong>3-5 business days</strong> to process after approval</li>
+                        <li>Refunds are issued to the <strong>original payment method</strong></li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-3">Non-Refundable Cases:</h6>
+                    <ul class="mb-0">
+                        <li>Events that have <strong>already started or completed</strong></li>
+                        <li>Repeated cancellation requests may be subject to review</li>
+                        <li>Processing fees are <strong>never refundable</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation
+        document.getElementById('refundForm').addEventListener('submit', function(e) {
+            const reason = document.getElementById('cancellationReason').value.trim();
+            const checkbox = document.getElementById('confirmCancellation');
+
+            if (reason.length < 10) {
+                e.preventDefault();
+                alert('❌ Please provide a detailed reason (minimum 10 characters)');
+                return false;
+            }
+
+            if (!checkbox.checked) {
+                e.preventDefault();
+                alert('❌ Please confirm that you understand the refund policy');
+                return false;
+            }
+
+            // Confirm action
+            const estimatedRefund = (@((Model.TotalAmount * 0.8m).ToString("N2"))).toFixed(2);
+            if (!confirm(`⚠️ Confirm Refund Request\n\nYou will receive: ${estimatedRefund} @Model.Currency (80% refund)\n\nThis action requires admin approval.\n\nProceed?`)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Character counter for textarea
+        const textarea = document.getElementById('cancellationReason');
+        const charCounter = document.getElementById('charCounter');
+
+        textarea.addEventListener('input', function() {
+            const length = this.value.length;
+            charCounter.textContent = `${length} characters`;
+
+            if (length < 10) {
+                charCounter.className = 'text-danger small mt-1';
+                charCounter.textContent += ' (minimum 10 required)';
+            } else {
+                charCounter.className = 'text-success small mt-1';
+                charCounter.innerHTML = `<i class="fas fa-check-circle"></i> ${length} characters`;
+            }
+        });
+    </script>
+}
+
+<style>
+    .alert ul {
+        padding-left: 1.5rem;
+        margin-bottom: 0;
+    }
+
+        .alert ul li {
+            margin-bottom: 0.5rem;
+        }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0;
+    }
+
+    .form-check-label {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .table td {
+        padding: 0.75rem 0.5rem;
+    }
+</style>

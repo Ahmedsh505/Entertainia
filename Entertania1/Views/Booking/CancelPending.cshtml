@@ -1,0 +1,212 @@
+﻿@model Entertania1.ViewModels.Book.CancelBookingViewModel
+@using Core.Enums
+
+@{
+    ViewData["Title"] = "Cancel Pending Booking";
+}
+<link rel="stylesheet" href="~/css/Booking/CancelPending.css" />
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Cancel Pending Booking
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Info Alert -->
+                    <div class="alert alert-info border-0 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">Quick Cancellation</h5>
+                                <p class="mb-0">This booking hasn't been paid yet, so you can cancel it instantly without any charges or admin approval.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-calendar-alt me-2 text-primary"></i>Booking Details
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <p class="mb-2">
+                                        <strong>Event:</strong><br>
+                                        <span class="fs-5">@Model.EventName</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="mb-2">
+                                        <strong>Booking Date:</strong><br>
+                                        @Model.BookingDate.ToString("MMM dd, yyyy HH:mm")
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="mb-2">
+                                        <strong>Number of Tickets:</strong><br>
+                                        <span class="badge bg-primary fs-6">@Model.NumberOfTickets</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="mb-2">
+                                        <strong>Status:</strong><br>
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            <i class="fas fa-clock"></i> Pending Payment
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <p class="mb-0">
+                                        <strong>Amount (Not Charged):</strong><br>
+                                        <span class="fs-4 text-muted text-decoration-line-through">
+                                            @Model.TotalAmount.ToString("N2") @Model.Currency
+                                        </span>
+                                        <span class="badge bg-success ms-2">No Charge</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What Happens Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-list-check me-2 text-success"></i>What happens when you cancel?
+                        </h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Your booking will be <strong>cancelled immediately</strong>
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>No charges</strong> will be made to your account
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>@Model.NumberOfTickets ticket(s)</strong> will become available for others
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                If you used a <strong>discount code</strong>, it will be restored
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>No admin approval</strong> required
+                            </li>
+                            <li class="list-group-item border-0 ps-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                You can <strong>book again</strong> anytime if tickets are still available
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Confirmation Question -->
+                    <div class="alert alert-light border border-warning mb-4">
+                        <h5 class="mb-0">
+                            <i class="fas fa-question-circle text-warning me-2"></i>
+                            Are you sure you want to cancel this booking?
+                        </h5>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <form asp-action="CancelPendingBooking"
+                          method="post"
+                          onsubmit="return confirmCancellation();">
+                        <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                        @Html.AntiForgeryToken()
+
+                        <div class="d-flex gap-3 justify-content-end flex-wrap">
+                            <a asp-action="MyBookings" class="btn btn-secondary btn-lg px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Keep Booking
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="fas fa-times-circle me-2"></i>Yes, Cancel Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card mt-3 border-0">
+                <div class="card-body">
+                    <h6 class="mb-2">
+                        <i class="fas fa-life-ring me-2 text-primary"></i>Need help?
+                    </h6>
+                    <p class="mb-0 text-muted small">
+                        If you're having issues with payment or want to change your booking details instead of cancelling,
+                        please contact our support team at <strong>support@entertania.com</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmCancellation() {
+            return confirm('⚠️ Are you absolutely sure you want to cancel this booking?\n\n' +
+                          'Event: @Model.EventName\n' +
+                          'Tickets: @Model.NumberOfTickets\n\n' +
+                          'This action cannot be undone, but you can book again if tickets are available.');
+        }
+
+        // Add fade-in animation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.card').classList.add('fade-in');
+        });
+    </script>
+
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .list-group-item {
+            padding: 0.75rem 0;
+            position: relative;
+            display: block;
+            padding: .5rem 1rem;
+            color: #212529;
+            text-decoration: none;
+             background-color: brown;
+            border: 1px solid rgba(0, 0, 0, .125);
+        }
+
+        .card-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* .list-group-item
+        Specificity: (0,1,0) {
+            position: relative;
+            display: block;
+            padding: .5rem 1rem;
+            color: #212529;
+            text-decoration: none;
+            /* background-color: #fff; */
+            border: 1px solid rgba(0, 0, 0, .125);
+        } */
+
+    </style>
+}

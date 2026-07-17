@@ -1,0 +1,133 @@
+﻿:root {
+    --gold: #C59D5F;
+    --gold-dark: #b38c4f;
+    --egyptian-blue: #0B3A6A;
+    --egyptian-blue-light: #0f4c8c;
+    --offwhite: #f9f7f3;
+    --offwhite-2: #fffdf9;
+    --dark-text: #2a2a2a;
+    --muted-text: #6f6f6f;
+    --card-bg: #ffffffdd;
+    --card-border: rgba(197,157,95,0.3);
+    --shadow-soft: 0 6px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* GENERAL STYLING */
+body {
+    background-color: var(--offwhite);
+    color: var(--dark-text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* CARD STYLING */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
+
+/* HEADER */
+.card-header.bg-warning {
+    background-color: var(--gold);
+    color: #fff;
+}
+
+.card-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* ALERTS */
+.alert-info {
+    background-color: var(--egyptian-blue-light);
+    color: #fff;
+    border: none;
+}
+
+.alert-light.border-warning {
+    border-color: var(--gold);
+    background-color: var(--offwhite-2);
+    color: var(--dark-text);
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: .5rem 1rem;
+    color: var(--dark-text);
+    border: 1px solid rgba(0, 0, 0, .125);
+    background-color: var(--offwhite-2);
+}
+
+    .list-group-item i {
+        color: var(--gold);
+    }
+
+/* BADGES */
+.badge.bg-primary {
+    background-color: var(--gold);
+    color: #fff;
+}
+
+.badge.bg-warning {
+    background-color: var(--gold);
+    color: #212529;
+}
+
+.badge.bg-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* BUTTONS */
+.btn-secondary {
+    background-color: var(--egyptian-blue-light);
+    border-color: var(--egyptian-blue-light);
+    color: #fff;
+}
+
+    .btn-secondary:hover {
+        background-color: var(--egyptian-blue);
+        border-color: var(--egyptian-blue);
+    }
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}
+
+    .btn-danger:hover {
+        background-color: #b02a37;
+        border-color: #b02a37;
+    }
+
+/* ANIMATIONS */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* TEXT */
+.text-muted {
+    color: var(--muted-text);
+}

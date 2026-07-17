@@ -1,0 +1,161 @@
+﻿/* ===============================
+   Egyptian Luxury Theme - Users Create
+   =============================== */
+
+/* Root Colors */
+:root {
+    --color-gold: #D4AF37;
+    --color-blue-egyptian: #003366;
+    --color-light-bg: #fdf9f3;
+    --color-dark-text: #1a1a1a;
+    --color-card-bg: #ffffff;
+    --border-radius: 12px;
+}
+
+/* Body */
+body {
+    background-color: var(--color-light-bg);
+    color: var(--color-dark-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card */
+.card {
+    background-color: var(--color-card-bg);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--color-gold);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease;
+    color: var(--color-blue-egyptian);
+}
+
+    .card:hover {
+        transform: translateY(-4px);
+    }
+
+/* Card Header */
+.card-header {
+    background: var(--color-gold) !important;
+    color: #fff;
+    font-weight: bold;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
+/* Form Inputs */
+.form-control, .form-select, textarea {
+    border: 2px solid lightslategray;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: var(--color-blue-egyptian);
+        box-shadow: 0 0 8px var(--color-blue-egyptian);
+    }
+
+/* Labels */
+.form-label {
+    font-weight: 600;
+    color: var(--color-dark-text);
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #e6f4ea;
+    border-color: var(--color-gold);
+    color: var(--color-dark-text);
+}
+
+.alert-danger {
+    background-color: #fdecea;
+    border-color: var(--color-gold);
+    color: var(--color-dark-text);
+}
+
+.alert-info {
+    background-color: #e8f0fd;
+    border-color: var(--color-blue-egyptian);
+    color: var(--color-dark-text);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--color-blue-egyptian);
+    color: #fff;
+    border: 2px solid var(--color-gold);
+}
+
+    .btn-primary:hover {
+        background-color: var(--color-gold);
+        color: #fff;
+        border-color: var(--color-blue-egyptian);
+    }
+
+.btn-secondary {
+    background-color: #d3d3d3;
+    color: var(--color-dark-text);
+    border: 2px solid var(--color-gold);
+}
+
+    .btn-secondary:hover {
+        background-color: var(--color-blue-egyptian);
+        color: #fff;
+    }
+
+.btn-warning {
+    background-color: var(--color-gold);
+    color: #fff;
+    border: 2px solid var(--color-gold);
+}
+
+    .btn-warning:hover {
+        background-color: var(--color-blue-egyptian);
+        color: #fff;
+    }
+
+/* Admin Info Card (Important Notes) */
+.card.bg-light {
+    background-color: #fdf9f3 !important;
+    border: 2px solid var(--color-gold);
+}
+
+    .card.bg-light .card-title {
+        color: var(--color-blue-egyptian);
+        font-weight: bold;
+    }
+
+    .card.bg-light ul li i {
+        font-size: 1.1rem;
+    }
+
+/* Headings */
+h1, h4, h5 {
+    color: var(--color-blue-egyptian);
+}
+
+/* Validation messages */
+.text-danger {
+    font-weight: 600;
+}
+
+/* Horizontal Rule */
+hr {
+    border-top: 2px solid var(--color-gold);
+}
+
+/* Misc Hover effects */
+a.btn:hover {
+    text-decoration: none;
+}

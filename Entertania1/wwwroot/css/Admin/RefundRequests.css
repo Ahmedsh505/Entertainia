@@ -1,0 +1,284 @@
+﻿/* ============================================
+   REFUND REQUESTS — Egyptian Light Theme
+   Off-white + Egyptian Blue + Gold accents
+   ============================================ */
+
+/* ---------- ROOT COLORS ---------- */
+:root {
+    --gold: #C59D5F;
+    --gold-dark: #b38c4f;
+    --egyptian-blue: #0B3A6A;
+    --egyptian-blue-light: #0f4c8c;
+    --offwhite: #f9f7f3;
+    --offwhite-2: #fffdf9;
+    --dark-text: #2a2a2a;
+    --muted-text: #6f6f6f;
+    --card-bg: #ffffffdd;
+    --card-border: rgba(197,157,95,0.3);
+    --shadow-soft: 0 6px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* ---------- PAGE BACKGROUND ---------- */
+body {
+    background: var(--offwhite);
+    color: var(--dark-text);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ---------- PAGE HEADER ---------- */
+h2 {
+    color: var(--egyptian-blue) !important;
+    font-weight: 700;
+}
+
+    h2 i {
+        color: var(--gold);
+    }
+
+p.text-muted {
+    color: var(--muted-text);
+}
+
+/* ---------- ALERTS ---------- */
+.alert {
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+}
+
+.alert-dismissible .btn-close {
+    filter: invert(0.7);
+}
+
+/* ---------- CARDS ---------- */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    transition: 0.3s;
+}
+
+    .card:hover {
+        box-shadow: var(--shadow-hover);
+    }
+
+.card-header {
+    border-bottom: none;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* ---------- TABLE ---------- */
+.table-responsive {
+    background: var(--offwhite);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+}
+
+.table thead {
+    background: var(--egyptian-blue);
+    color: white;
+}
+
+    .table thead th {
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .table thead th:hover {
+            background: var(--egyptian-blue-light);
+        }
+
+.table tbody tr {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    transition: 0.3s;
+}
+
+    .table tbody tr:hover {
+        background: #fff8e1; /* subtle gold-ish highlight on hover */
+        transform: translateY(-2px);
+    }
+
+    .table tbody tr.table-secondary {
+        background: rgba(197, 157, 95, 0.1);
+        color: var(--muted-text);
+    }
+
+/* ---------- BADGES ---------- */
+.badge {
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.4em 0.65em;
+    font-size: 0.85rem;
+}
+
+    .badge.bg-danger {
+        background: #dc3545 !important;
+    }
+
+    .badge.bg-warning {
+        background: #ffc107 !important;
+        color: var(--dark-text) !important;
+    }
+
+    .badge.bg-success {
+        background: #198754 !important;
+    }
+
+    .badge.bg-info {
+        background: var(--gold);
+        color: #fff !important;
+    }
+
+    .badge.bg-secondary {
+        background: var(--muted-text);
+        color: #fff !important;
+    }
+
+/* ---------- BUTTONS ---------- */
+.btn {
+    border-radius: 50px;
+    padding: 0.35rem 0.9rem;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: var(--egyptian-blue);
+    color: white;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background: var(--egyptian-blue-light);
+    }
+
+.btn-success {
+    background: var(--gold);
+    color: white;
+    border: none;
+}
+
+    .btn-success:hover {
+        background: var(--gold-dark);
+    }
+
+.btn-outline-secondary {
+    border-color: var(--gold);
+    color: var(--egyptian-blue);
+}
+
+    .btn-outline-secondary:hover {
+        background: var(--gold);
+        color: white;
+    }
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ---------- FORM CONTROLS ---------- */
+input.form-control, select.form-select, textarea.form-control {
+    border-radius: 50px;
+    border: 1px solid var(--gold-dark);
+    transition: 0.3s;
+}
+
+    input.form-control:focus, select.form-select:focus, textarea.form-control:focus {
+        border-color: var(--egyptian-blue);
+        box-shadow: 0 0 0 0.2rem rgba(11, 58, 106, 0.25);
+        background: #fff;
+    }
+
+/* ---------- SEARCH BOX ---------- */
+.input-group .form-control {
+    border-radius: 50px;
+    border: 1px solid var(--gold-dark);
+    background: var(--offwhite-2);
+    color: var(--dark-text);
+}
+
+.input-group .input-group-text {
+    background: var(--offwhite);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold);
+    border-radius: 50px 0 0 50px;
+}
+
+.input-group .btn {
+    border-radius: 0 50px 50px 0;
+    border: none;
+    background: var(--egyptian-blue);
+    color: white;
+}
+
+    .input-group .btn:hover {
+        background: var(--egyptian-blue-light);
+    }
+
+/* ---------- PAGINATION ---------- */
+.pagination .page-link {
+    border-radius: 30px;
+    padding: 8px 16px;
+    border: 1px solid var(--gold);
+    color: var(--egyptian-blue);
+    transition: 0.3s;
+}
+
+.page-item.active .page-link {
+    background: var(--egyptian-blue);
+    color: #fff;
+}
+
+.page-item:hover .page-link {
+    background: var(--gold);
+    color: #fff;
+}
+
+/* ---------- FULL-SCREEN MODALS ---------- */
+.modal-backdrop.show {
+    background-color: rgba(0,0,0,0.6);
+}
+
+.modal-dialog {
+    max-width: 600px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--card-border);
+}
+
+    .modal-header .btn-close {
+        filter: invert(1);
+    }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* ---------- TOOLTIP ---------- */
+[data-bs-toggle="tooltip"] {
+    cursor: pointer;
+}

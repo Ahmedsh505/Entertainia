@@ -1,0 +1,46 @@
+﻿@using Core.Models.EventModels
+@model TourismActivity
+
+@if (Model != null)
+{
+    <div class="info-card fade-in">
+        <div class="card-header-custom">
+            <h3 class="section-title">
+                <i class="fas fa-map"></i>
+                Tourism Activity Details
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-user-circle"></i>
+                    Guide Name
+                </div>
+                <div class="info-content">@Model.GuideName</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-map-signs"></i>
+                    Tour Type
+                </div>
+                <div class="info-content">@Model.TourType</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-hourglass-half"></i>
+                    Duration
+                </div>
+                <div class="info-content">@Model.DurationHours hours</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fas fa-map"></i>
+        <p>No tourism activity details available</p>
+    </div>
+}

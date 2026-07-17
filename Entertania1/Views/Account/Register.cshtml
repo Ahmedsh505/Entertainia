@@ -1,0 +1,512 @@
+﻿@model Entertania1.ViewModels.Account.RegisterVM
+@{
+    ViewData["Title"] = "Register";
+}
+<link rel="stylesheet" href="~/css/Account/Register.css" asp-append-version="true" />
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join Entertania and discover amazing events</p>
+        </div>
+
+        <div class="auth-body">
+            <form asp-action="Register" method="post" enctype="multipart/form-data" id="registerForm">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="validation-summary"></div>
+                }
+
+                <!-- First Name -->
+                <div class="form-group">
+                    <label asp-for="FirstName" class="field-label">
+                        <i class="bi bi-person"></i>
+                        <span>First Name</span>
+                    </label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label asp-for="LastName" class="field-label">
+                        <i class="bi bi-person"></i>
+                        <span>Last Name</span>
+                    </label>
+                    <input asp-for="LastName" class="form-control" placeholder="Enter your last name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label asp-for="Email" class="field-label">
+                        <i class="bi bi-envelope"></i>
+                        <span>Email</span>
+                    </label>
+                    <input asp-for="Email" class="form-control" placeholder="example@email.com" type="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label asp-for="UserName" class="field-label">
+                        <i class="bi bi-at"></i>
+                        <span>User Name</span>
+                    </label>
+                    <input asp-for="UserName" class="form-control" placeholder="Choose a unique username" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="field-label">
+                        <i class="bi bi-telephone"></i>
+                        <span>Phone Number</span>
+                    </label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="+20 123 456 7890" type="tel" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Address -->
+                <div class="form-group">
+                    <label asp-for="Address" class="field-label">
+                        <i class="bi bi-geo-alt"></i>
+                        <span>Address</span>
+                    </label>
+                    <input asp-for="Address" class="form-control" placeholder="Enter your full address" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label asp-for="Password" class="field-label">
+                        <i class="bi bi-lock"></i>
+                        <span>Password</span>
+                    </label>
+                    <div class="password-field">
+                        <input asp-for="Password" class="form-control" placeholder="Create a strong password" type="password" id="passwordInput" />
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="field-label">
+                        <i class="bi bi-lock-fill"></i>
+                        <span>Confirm Password</span>
+                    </label>
+                    <div class="password-field">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Re-enter your password" type="password" id="confirmPasswordInput" />
+                        <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                            <i class="bi bi-eye" id="toggleConfirmIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--blue-egyptian); font-weight: 600; margin-bottom: 1rem; display: block;">
+                        Select Account Type
+                    </label>
+                    <div class="role-selector">
+                        @foreach (var role in ViewBag.Roles as IEnumerable<string>)
+                        {
+                            <div class="role-option">
+                                <input type="radio" asp-for="Role" value="@role" id="role_@role" />
+                                <label for="role_@role" class="role-label">
+                                    <i class="bi bi-@(role == "Customer" ? "person" : role == "Organizer" ? "building" : "shield-check")"></i>
+                                    <span>@role</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+
+                <!-- Verification Documents Upload (Organizer Only) -->
+                <div id="uploadSection" style="display: none;">
+                    <label class="form-label" style="color: var(--blue-egyptian); font-weight: 600; margin-bottom: 0.5rem; display: block;">
+                        Verification Documents <span style="color: #f87171;">*</span>
+                    </label>
+                    <!-- Required Documents List -->
+                    <div class="required-docs-info">
+                        <div class="doc-requirement">
+                            <i class="bi bi-card-heading"></i>
+                            <span>National ID (Front & Back)</span>
+                            <span class="req-badge">Required</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-building"></i>
+                            <span>Commercial Registration</span>
+                            <span class="req-badge">Required</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-receipt"></i>
+                            <span>Tax Card</span>
+                            <span class="req-badge">Required</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-file-earmark-check"></i>
+                            <span>Company License</span>
+                            <span class="opt-badge">Optional</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-bank"></i>
+                            <span>Bank Statement/IBAN</span>
+                            <span class="req-badge">Required</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-pen"></i>
+                            <span>Authorization Letter</span>
+                            <span class="req-badge">Required</span>
+                        </div>
+                        <div class="doc-requirement">
+                            <i class="bi bi-images"></i>
+                            <span>Event Portfolio</span>
+                            <span class="opt-badge">Optional</span>
+                        </div>
+                    </div>
+
+                    <div class="upload-section" id="uploadZone">
+                        <div class="upload-btn-wrapper">
+                            <button type="button" class="upload-btn" id="uploadBtn">
+                                <i class="bi bi-cloud-upload"></i>
+                                Choose Files
+                            </button>
+                            <input type="file" id="fileInput" name="VerificationDocuments" multiple
+                                   accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.bmp,.webp"
+                                   style="display: none;" />
+                        </div>
+                        <div class="upload-info">
+                            <p style="margin-bottom: 0.5rem;">
+                                <strong>Upload at least 1 document</strong> (max 25)
+                            </p>
+                            <p style="margin: 0; font-size: 0.85rem;">
+                                Supported: PDF, Word, Excel, PowerPoint, Images<br>
+                                Max 100 MB per file • 2 GB total
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="fileListContainer"></div>
+                    <span class="text-danger" id="fileValidationMessage"></span>
+                </div>
+
+                <button type="submit" class="btn-register" id="submitBtn">
+                    <i class="bi bi-check-circle me-2"></i> Create Account
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            Already have an account? <a asp-action="Login">Sign in here</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ✅ Password preservation on validation errors
+        window.addEventListener('DOMContentLoaded', function() {
+            // Store password values before form submission
+            const registerForm = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('passwordInput');
+            const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+
+            if (registerForm) {
+                // Before submit, store values in sessionStorage
+                registerForm.addEventListener('submit', function() {
+                    if (passwordInput.value) {
+                        sessionStorage.setItem('reg_password', passwordInput.value);
+                    }
+                    if (confirmPasswordInput.value) {
+                        sessionStorage.setItem('reg_confirm_password', confirmPasswordInput.value);
+                    }
+                });
+
+                // On page load, if there are validation errors, restore passwords
+                const hasValidationErrors = document.querySelector('.validation-summary-errors') ||
+                                           document.querySelector('.text-danger:not(:empty)');
+
+                if (hasValidationErrors) {
+                    const savedPassword = sessionStorage.getItem('reg_password');
+                    const savedConfirmPassword = sessionStorage.getItem('reg_confirm_password');
+
+                    if (savedPassword && passwordInput) {
+                        passwordInput.value = savedPassword;
+                    }
+                    if (savedConfirmPassword && confirmPasswordInput) {
+                        confirmPasswordInput.value = savedConfirmPassword;
+                    }
+                } else {
+                    // Clear stored passwords if no errors (successful submission or fresh page)
+                    sessionStorage.removeItem('reg_password');
+                    sessionStorage.removeItem('reg_confirm_password');
+                }
+            }
+        });
+
+        // Password toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('passwordInput');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        if (togglePassword && passwordInput && toggleIcon) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                toggleIcon.classList.toggle('bi-eye');
+                toggleIcon.classList.toggle('bi-eye-slash');
+            });
+        }
+
+        // Confirm Password toggle
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+        const toggleConfirmIcon = document.getElementById('toggleConfirmIcon');
+
+        if (toggleConfirmPassword && confirmPasswordInput && toggleConfirmIcon) {
+            toggleConfirmPassword.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                toggleConfirmIcon.classList.toggle('bi-eye');
+                toggleConfirmIcon.classList.toggle('bi-eye-slash');
+            });
+        }
+
+        // Role-based upload section toggle
+        const roleInputs = document.querySelectorAll('input[name="Role"]');
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const fileValidationMessage = document.getElementById('fileValidationMessage');
+        const registerForm = document.getElementById('registerForm');
+        const uploadZone = document.getElementById('uploadZone');
+
+        let selectedFiles = [];
+        const maxFiles = 25;
+        const maxFileSize = 100 * 1024 * 1024; // 100 MB
+        const maxTotalSize = 2 * 1024 * 1024 * 1024; // 2 GB
+        const allowedExtensions = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.jpg', '.jpeg', '.png', '.bmp', '.webp'];
+
+        // Toggle upload section based on role
+        roleInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.value === 'Organizer') {
+                    uploadSection.style.display = 'block';
+                } else {
+                    uploadSection.style.display = 'none';
+                    selectedFiles = [];
+                    renderFileList();
+                }
+            });
+        });
+
+        // Check initial role selection
+        const selectedRole = document.querySelector('input[name="Role"]:checked');
+        if (selectedRole && selectedRole.value === 'Organizer') {
+            uploadSection.style.display = 'block';
+        }
+
+        // Open file picker
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+        }
+
+        // Handle file selection
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                addFiles(files);
+                fileInput.value = '';
+            });
+        }
+
+        // Drag and drop
+        if (uploadZone) {
+            uploadZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            uploadZone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files);
+                addFiles(files);
+            });
+        }
+
+        // Add files with validation
+        function addFiles(files) {
+            if (fileValidationMessage) {
+                fileValidationMessage.textContent = '';
+            }
+
+            for (let file of files) {
+                if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    continue;
+                }
+
+                if (selectedFiles.length >= maxFiles) {
+                    if (fileValidationMessage) {
+                        fileValidationMessage.textContent = `Maximum ${maxFiles} files allowed.`;
+                    }
+                    break;
+                }
+
+                if (file.size > maxFileSize) {
+                    if (fileValidationMessage) {
+                        fileValidationMessage.textContent = `File "${file.name}" exceeds 100 MB limit.`;
+                    }
+                    continue;
+                }
+
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+                if (!allowedExtensions.includes(ext)) {
+                    if (fileValidationMessage) {
+                        fileValidationMessage.textContent = `File "${file.name}" has unsupported format.`;
+                    }
+                    continue;
+                }
+
+                selectedFiles.push(file);
+            }
+
+            const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+            if (totalSize > maxTotalSize) {
+                if (fileValidationMessage) {
+                    fileValidationMessage.textContent = 'Total file size exceeds 2 GB limit.';
+                }
+                while (selectedFiles.reduce((sum, f) => sum + f.size, 0) > maxTotalSize) {
+                    selectedFiles.pop();
+                }
+            }
+
+            renderFileList();
+        }
+
+        // Remove file
+        window.removeFile = function(index) {
+            selectedFiles.splice(index, 1);
+            renderFileList();
+            if (fileValidationMessage) {
+                fileValidationMessage.textContent = '';
+            }
+        }
+
+        // Render file list
+        function renderFileList() {
+            if (!fileListContainer) return;
+
+            if (selectedFiles.length === 0) {
+                fileListContainer.innerHTML = '';
+                return;
+            }
+
+            let html = '<div style="margin-top: 1.5rem;">';
+            selectedFiles.forEach((file, index) => {
+                const fileSize = formatFileSize(file.size);
+                const fileIcon = getFileIcon(file.name);
+
+                html += `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon">${fileIcon}</div>
+                            <div class="file-details">
+                                <div class="file-name">${escapeHtml(file.name)}</div>
+                                <div class="file-size">${fileSize}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="file-remove" onclick="removeFile(${index})">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+                `;
+            });
+
+            const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+            html += `
+                <div class="file-summary">
+                    <strong>${selectedFiles.length}</strong> file(s) selected •
+                    Total: <strong>${formatFileSize(totalSize)}</strong>
+                </div>
+            `;
+            html += '</div>';
+
+            fileListContainer.innerHTML = html;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Get file icon
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'bmp', 'webp'].includes(ext)) {
+                return '🖼️';
+            } else if (ext === 'pdf') {
+                return '📄';
+            } else if (['doc', 'docx'].includes(ext)) {
+                return '📝';
+            } else if (['ppt', 'pptx'].includes(ext)) {
+                return '📊';
+            } else if (['xls', 'xlsx'].includes(ext)) {
+                return '📈';
+            }
+            return '📎';
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Form submission
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                const selectedRole = document.querySelector('input[name="Role"]:checked');
+                if (selectedRole && selectedRole.value === 'Organizer' && selectedFiles.length === 0) {
+                    e.preventDefault();
+                    if (fileValidationMessage) {
+                        fileValidationMessage.textContent = 'At least one verification document is required.';
+                    }
+                    return false;
+                }
+
+                if (fileInput) {
+                    const dataTransfer = new DataTransfer();
+                    selectedFiles.forEach(file => {
+                        dataTransfer.items.add(file);
+                    });
+                    fileInput.files = dataTransfer.files;
+                }
+            });
+        }
+
+        // Initialize
+        renderFileList();
+    </script>
+}

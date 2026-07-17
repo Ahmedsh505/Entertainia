@@ -1,0 +1,135 @@
+﻿@model Entertania1.ViewModels.User.EditUserVM
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/Edit.css" />
+}
+<div class="container mt-4">
+    <h1>Edit User</h1>
+    <h4 class="text-muted">Admin: Modify user information</h4>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserName" class="form-label"></label>
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" type="tel" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Role" class="form-label"></label>
+                                <select asp-for="Role" class="form-select">
+                                    <option value="Admin">Admin</option>
+                                    <option value="Organizer">Organizer</option>
+                                    <option value="Customer">Customer</option>
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="AccountStatus" class="form-label"></label>
+                                <select asp-for="AccountStatus" class="form-select">
+                                    <option value="0">Pending Approval</option>
+                                    <option value="1">Active</option>
+                                    <option value="2">Rejected</option>
+                                    <option value="3">Disabled</option>
+                                </select>
+                                <span asp-validation-for="AccountStatus" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                            <a asp-action="AdminChangePassword" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="bi bi-key"></i> Change Password
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle"></i> Admin Privileges
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-pencil text-primary"></i> Edit any user's information
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-toggle-on text-success"></i> Change account status
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-person-badge text-info"></i> Change user roles
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-key text-warning"></i> Reset user passwords
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

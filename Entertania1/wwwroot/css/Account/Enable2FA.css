@@ -1,0 +1,103 @@
+﻿/* ============================
+   LIGHT EGYPTIAN THEME + GOLD
+   ============================ */
+
+:root {
+    --color-bg-elevated: #ffffff;
+    --color-text-primary: #0b2235; /* Dark Egyptian Blue */
+    --color-text-secondary: #3b4f61;
+    --color-accent-start: #C59D3B; /* Gold start */
+    --color-accent-end: #E0B95A; /* Gold end */
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --radius-md: 12px;
+    --radius-lg: 22px;
+    --shadow-glow: 0 0 12px rgba(197, 157, 59, 0.45);
+}
+
+/* Container */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 15px;
+}
+
+/* Card */
+.auth-card {
+    background: var(--color-bg-elevated);
+    width: 100%;
+    max-width: 620px;
+    border-radius: var(--radius-lg);
+    padding-bottom: 25px;
+    border: 1px solid var(--color-accent-start);
+}
+
+/* Header */
+.auth-header {
+    text-align: center;
+    background: var(--gradient-primary);
+    padding: 35px 20px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    color: #fff;
+}
+
+.auth-icon {
+    font-size: 55px;
+    margin-bottom: 8px;
+}
+
+.auth-title {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.auth-subtitle {
+    font-size: 15px;
+    opacity: .9;
+}
+
+/* Body */
+.auth-body {
+    padding: 30px 35px;
+}
+
+/* Alert Box */
+.alert-custom {
+    background: #fffdf1;
+    border-left: 4px solid var(--color-accent-start);
+    padding: 18px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    color: var(--color-text-primary);
+}
+
+/* Buttons */
+.btn-auth {
+    background: var(--gradient-primary);
+    border: none;
+    padding: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    color: #fff;
+    transition: .3s;
+}
+
+    .btn-auth:hover {
+        box-shadow: var(--shadow-glow);
+        transform: translateY(-2px);
+        color: var( --color-text-primary);
+    }
+
+/* Links */
+.auth-link {
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--color-accent-start);
+    transition: .2s;
+}
+
+    .auth-link:hover {
+        text-decoration: underline;
+        color: var( --color-text-primary);
+    }

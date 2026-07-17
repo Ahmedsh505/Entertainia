@@ -1,0 +1,451 @@
+﻿@model Entertania1.ViewModels.Book.BookingDetailsViewModel
+@using Core.Enums
+@inject Core.Interfaces.ServicesInterface.ITicketService TicketService
+
+@{
+    ViewData["Title"] = "Booking Details";
+    var currencySymbol = Model.Currency switch
+    {
+        Currency.EGP => "EGP",
+        Currency.USD => "$",
+        Currency.EUR => "€",
+        _ => "EGP"
+    };
+}
+<link rel="stylesheet" href="~/css/Booking/BookingDetails.css" />
+
+<div class="booking-container">
+    <!-- Header -->
+    <div class="booking-header">
+        <div>
+            <h2><i class="fas fa-receipt"></i> Booking Details</h2>
+            <p class="text-muted">Booking #@Model.BookingId</p>
+        </div>
+        <div>
+            <span class="@Model.GetStatusBadgeClass()">@Model.Status</span>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="booking-alert booking-alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <span class="booking-alert-close" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="booking-alert booking-alert-error">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <span class="booking-alert-close" onclick="this.parentElement.style.display='none';">&times;</span>
+        </div>
+    }
+
+    <div class="booking-main">
+        <!-- Left Column -->
+        <div class="booking-left">
+            <!-- Event Information -->
+            <div class="booking-card">
+                <div class="booking-card-header">
+                    <h5><i class="fas fa-calendar-alt"></i> Event Information</h5>
+                </div>
+                <div class="booking-card-body">
+                    <h4>@Model.EventTitle</h4>
+                    <p class="text-muted">@Model.EventDescription</p>
+
+                    <div class="booking-event-details">
+                        <div class="booking-event-item">
+                            <i class="fas fa-tag"></i>
+                            <div>
+                                <small class="text-muted">Category</small>
+                                <div><strong>@Model.EventCategory</strong></div>
+                            </div>
+                        </div>
+                        <div class="booking-event-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <small class="text-muted">Start Date</small>
+                                <div><strong>@Model.EventStartDate.ToString("dd MMM yyyy HH:mm")</strong></div>
+                            </div>
+                        </div>
+                        <div class="booking-event-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <small class="text-muted">Venue</small>
+                                <div><strong>@Model.VenueName</strong></div>
+                                <small>@Model.VenueLocation</small>
+                            </div>
+                        </div>
+                        <div class="booking-event-item">
+                            <i class="fas fa-ticket-alt"></i>
+                            <div>
+                                <small class="text-muted">Ticket Tier</small>
+                                <div><strong>@Model.GetTierName()</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.GoogleMapsUrl))
+                    {
+                        <div class="mt-3">
+                            <a href="@Model.GoogleMapsUrl" target="_blank" class="booking-btn booking-btn-outline-primary btn-sm">
+                                <i class="fas fa-map"></i> View on Maps
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Refund Sections -->
+            @if (Model.Status == "Pending Refund" && Model.Refund != null)
+            {
+                <div class="booking-card border-warning">
+                    <div class="booking-card-header bg-warning">
+                        <h5><i class="fas fa-hourglass-half"></i> Refund Pending Approval</h5>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-alert booking-alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> Your refund request is awaiting admin review.
+                            You will receive an email notification once the decision is made.
+                        </div>
+
+                        <div class="booking-event-details">
+                            <div class="booking-event-item">
+                                <small class="text-muted">Requested Amount</small>
+                                <div><strong class="text-success">@Model.Refund.RefundAmount.ToString("N2") @currencySymbol</strong></div>
+                                <small class="text-muted">(80% of @Model.Refund.OriginalAmount.ToString("N2") @currencySymbol)</small>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Requested On</small>
+                                <div><strong>@Model.Refund.RequestedAt.ToString("dd MMM yyyy HH:mm")</strong></div>
+                            </div>
+                            <div class="booking-event-item col-12">
+                                <small class="text-muted">Reason</small>
+                                <div>@Model.Refund.Reason</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Status == "Refunded" && Model.Refund != null)
+            {
+                <div class="booking-card border-success">
+                    <div class="booking-card-header bg-success">
+                        <h5><i class="fas fa-check-circle"></i> Refund Completed</h5>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-alert booking-alert-success mb-3">
+                            <i class="fas fa-check-circle"></i> Your refund has been approved and processed!
+                        </div>
+
+                        <div class="booking-event-details">
+                            <div class="booking-event-item">
+                                <small class="text-muted">Refunded Amount</small>
+                                <div><strong class="text-success">@Model.Refund.RefundAmount.ToString("N2") @currencySymbol</strong></div>
+                                <small class="text-muted">(80% of @Model.Refund.OriginalAmount.ToString("N2") @currencySymbol)</small>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Processed On</small>
+                                <div><strong>@Model.Refund.ProcessedAt?.ToString("dd MMM yyyy HH:mm")</strong></div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Refund.AdminNotes))
+                            {
+                                <div class="booking-event-item col-12">
+                                    <small class="text-muted">Admin Notes</small>
+                                    <div>@Model.Refund.AdminNotes</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Status == "Refund Rejected" && Model.Refund != null)
+            {
+                <div class="booking-card border-danger">
+                    <div class="booking-card-header bg-danger">
+                        <h5><i class="fas fa-times-circle"></i> Refund Request Rejected</h5>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-alert booking-alert-error mb-3">
+                            <i class="fas fa-times-circle"></i> Your refund request was not approved.
+                        </div>
+
+                        <div class="booking-event-details">
+                            <div class="booking-event-item">
+                                <small class="text-muted">Requested Amount</small>
+                                <div><strong>@Model.Refund.RefundAmount.ToString("N2") @currencySymbol</strong></div>
+                                <small class="text-muted">(80% of @Model.Refund.OriginalAmount.ToString("N2") @currencySymbol)</small>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Rejected On</small>
+                                <div><strong>@Model.Refund.ProcessedAt?.ToString("dd MMM yyyy HH:mm")</strong></div>
+                            </div>
+                            <div class="booking-event-item col-12">
+                                <small class="text-muted">Rejection Reason</small>
+                                <div class="booking-alert booking-alert-warning py-2 px-2 mb-0">
+                                    <strong>@Model.Refund.FailureReason</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <p class="mb-2"><strong>What happens next?</strong></p>
+                            <ul class="mb-0">
+                                <li>Your booking remains active and confirmed</li>
+                                <li>You can still attend the event with your tickets</li>
+                                <li>If you believe this decision is incorrect, please contact support</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Tickets Section -->
+            @if (Model.HasTickets && Model.Status == "Confirmed")
+            {
+                <div class="booking-card border-success">
+                    <div class="booking-card-header bg-success">
+                        <h5><i class="fas fa-ticket-alt"></i> Your Tickets (@Model.Tickets.Count)</h5>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-alert booking-alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> Present these QR codes at the venue entrance.
+                        </div>
+
+                        <div class="mb-3">
+                            <a asp-controller="Ticket" asp-action="DownloadPDF" asp-route-bookingId="@Model.BookingId"
+                               class="booking-btn">
+                                <i class="fas fa-download"></i> Download All Tickets (PDF)
+                            </a>
+                        </div>
+
+                        <div class="booking-tickets-grid">
+                            @foreach (var ticket in Model.Tickets.OrderBy(t => t.TicketNumber))
+                            {
+                                <div class="booking-ticket-card">
+                                    <h6>Ticket #@ticket.TicketNumber</h6>
+                                    <span class="@ticket.GetStatusBadgeClass() mb-2 d-inline-block">@ticket.Status</span>
+
+                                    @try
+                                    {
+                                        var qrCodeBase64 = TicketService.GenerateQRCodeBase64(ticket.QRCodeData);
+
+                                        if (!string.IsNullOrEmpty(qrCodeBase64))
+                                        {
+                                            <img src="data:image/png;base64,@qrCodeBase64"
+                                                 alt="QR Code for Ticket #@ticket.TicketNumber"
+                                                 class="img-fluid mb-2" />
+                                        }
+                                        else
+                                        {
+                                            <div class="booking-alert booking-alert-warning">
+                                                <small>QR code unavailable</small>
+                                            </div>
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        <div class="booking-alert booking-alert-warning">
+                                            <small>QR code generation error</small>
+                                        </div>
+                                    }
+
+                                    <small class="text-muted d-block">Ticket ID: @ticket.TicketId</small>
+                                    <small class="text-muted d-block">Tier: @ticket.Tier</small>
+
+                                    @if (ticket.IsScanned)
+                                    {
+                                        <div class="mt-2">
+                                            <span class="booking-badge-warning">
+                                                <i class="fas fa-check"></i> Scanned @ticket.ScanCount time(s)
+                                            </span>
+                                            <small class="d-block text-muted mt-1">
+                                                Last: @ticket.LastScannedAt?.ToString("dd MMM HH:mm")
+                                            </small>
+                                        </div>
+                                    }
+
+                                    <div class="mt-3">
+                                        <a asp-controller="Ticket" asp-action="Verify" asp-route-ticketId="@ticket.TicketId"
+                                           class="booking-btn booking-btn-outline-success" target="_blank">
+                                            <i class="fas fa-qrcode"></i> View Full Ticket
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (Model.Tickets.Any() && Model.Tickets.First().ExpiresAt.HasValue)
+                        {
+                            <div class="booking-alert booking-alert-warning mt-3 mb-0">
+                                <small>
+                                    <i class="fas fa-clock"></i>
+                                    Tickets valid until: <strong>@Model.Tickets.First().ExpiresAt.Value.ToString("dd MMM yyyy HH:mm")</strong>
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Status == "Confirmed" && !Model.HasTickets)
+            {
+                <div class="booking-alert booking-alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Tickets are being generated. Please refresh the page in a moment.
+                </div>
+            }
+
+            <!-- Payment Information -->
+            @if (Model.Payment != null)
+            {
+                <div class="booking-card">
+                    <div class="booking-card-header bg-success">
+                        <h5><i class="fas fa-credit-card"></i> Payment Information</h5>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-event-details">
+                            <div class="booking-event-item">
+                                <small class="text-muted">Payment Status</small>
+                                <div><span class="@Model.GetPaymentStatusBadgeClass()">@Model.Payment.Status</span></div>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Transaction ID</small>
+                                <div><code>@Model.Payment.TransactionId</code></div>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Payment Method</small>
+                                <div><strong>@Model.Payment.PaymentMethod</strong></div>
+                            </div>
+                            <div class="booking-event-item">
+                                <small class="text-muted">Payment Date</small>
+                                <div><strong>@Model.Payment.CompletedAt?.ToString("dd MMM yyyy HH:mm")</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column: Booking Summary -->
+        <div class="booking-right">
+            <div class="booking-card ">
+                <div class="booking-card-header">
+                    <h5><i class="fas fa-file-invoice"></i> Booking Summary</h5>
+                </div>
+                <div class="booking-card-body">
+                    <div class="booking-summary-line">
+                        <small class="text-muted">Booking Date</small>
+                        <div><strong>@Model.BookingDate.ToString("dd MMM yyyy HH:mm")</strong></div>
+                    </div>
+                    <div class="booking-summary-line">
+                        <small class="text-muted">Number of Tickets</small>
+                        <div><strong>@Model.NumberOfTickets × @Model.GetTierName()</strong></div>
+                    </div>
+
+                    <hr />
+
+                    <div class="booking-summary-line">
+                        <span>Price per Ticket:</span>
+                        <span>@Model.PricePerTicket.ToString("N2") @currencySymbol</span>
+                    </div>
+                    <div class="booking-summary-line">
+                        <span>Subtotal:</span>
+                        <span>@Model.TotalPrice.ToString("N2") @currencySymbol</span>
+                    </div>
+
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="booking-summary-line text-success">
+                            <span>
+                                <i class="fas fa-tag"></i> Discount:
+                                @if (!string.IsNullOrEmpty(Model.DiscountCodeUsed))
+                                {
+                                    <small>(@Model.DiscountCodeUsed)</small>
+                                }
+                            </span>
+                            <span>-@Model.DiscountAmount.ToString("N2") @currencySymbol</span>
+                        </div>
+                    }
+
+                    <div class="booking-summary-line">
+                        <span>Tax (14%):</span>
+                        <span>@Model.TaxAmount.ToString("N2") @currencySymbol</span>
+                    </div>
+
+                    <hr />
+
+                    <div class="booking-summary-line total">
+                        <strong>Total Amount:</strong>
+                        <strong class="text-primary">@Model.TotalWithTax.ToString("N2") @currencySymbol</strong>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="booking-btn-container">
+                        @if (Model.Status == "PendingPayment")
+                        {
+                            <a asp-controller="Booking" asp-action="RetryPayment" asp-route-bookingId="@Model.BookingId"
+                               class="booking-btn booking-btn-warning">
+                                <i class="fas fa-credit-card"></i> Complete Payment
+                            </a>
+                        }
+
+                        @if (Model.CanRequestRefund())
+                        {
+                            <a asp-controller="Booking" asp-action="Cancel" asp-route-bookingId="@Model.BookingId"
+                               class="booking-btn booking-btn-outline-danger">
+                                <i class="fas fa-undo"></i> Request Refund
+                            </a>
+                        }
+
+                        @if (Model.Status == "Pending Refund")
+                        {
+                            <button class="booking-btn booking-btn-info" disabled>
+                                <i class="fas fa-hourglass-half"></i> Refund Pending
+                            </button>
+                        }
+
+                        @if (Model.Status == "Refund Rejected")
+                        {
+                            <div class="booking-alert booking-alert-warning mb-2 py-2 px-2">
+                                <small><i class="fas fa-info-circle"></i> Refund was rejected. You can still attend the event.</small>
+                            </div>
+                        }
+
+                        <a asp-controller="Booking" asp-action="MyBookings" class="booking-btn booking-btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to My Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="booking-card">
+                <div class="booking-card-header bg-light">
+                    <h6><i class="fas fa-user"></i> Customer Information</h6>
+                </div>
+                <div class="booking-card-body">
+                    <div class="mb-2">
+                        <small class="text-muted">Name</small>
+                        <div><strong>@Model.UserName</strong></div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Email</small>
+                        <div><strong>@Model.UserEmail</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            document.querySelectorAll('.booking-alert').forEach(function(el) { el.style.display='none'; });
+        }, 5000);
+    </script>
+}

@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Delete Customer Account";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/DeleteCustomerAccount.css" />
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body text-center py-5">
+                    <h2 class="text-danger fw-bold mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Your Account
+                    </h2>
+
+                    <p class="text-muted fs-5 mb-4">
+                        We're sorry to see you go. Deleting your account will <strong>permanently remove all your data</strong>,
+                        including your profile, bookings, and history. This action <strong>cannot be undone</strong>.
+                    </p>
+
+                    <form asp-action="DeleteMyCustomerAccount" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="alert alert-warning text-start">
+                            <h5 class="mb-2"><i class="bi bi-exclamation-circle"></i> Please Confirm</h5>
+                            <p class="mb-0">
+                                Once deleted, your account and all associated information will be gone forever.
+                                Are you absolutely sure you want to continue?
+                            </p>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-4 gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="bi bi-trash3-fill me-1"></i> Yes, Delete My Account
+                            </button>
+                            <a asp-action="MyProfile" class="btn btn-secondary btn-lg px-4">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mt-4 text-center">
+                    <i class="bi bi-x-circle-fill me-2"></i>@TempData["ErrorMessage"]
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success mt-4 text-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                </div>
+            }
+        </div>
+    </div>
+</div>

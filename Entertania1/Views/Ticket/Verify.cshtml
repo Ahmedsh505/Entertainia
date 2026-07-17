@@ -1,0 +1,195 @@
+﻿@model Core.Models.TicketModels.Ticket
+
+@{
+    ViewData["Title"] = "Ticket Verification";
+    var isValid = ViewBag.IsValid as bool? ?? false;
+    var message = ViewBag.Message as string ?? "";
+    var qrCodeBase64 = ViewBag.QRCodeBase64 as string ?? "";
+}
+<link rel="stylesheet" href="~/css/Ticket/Verify.css" />
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Verification Status Card -->
+            <div class="card shadow-lg mb-4">
+                <div class="card-header @(isValid ? "bg-success" : "bg-danger") text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fas @(isValid ? "fa-check-circle" : "fa-times-circle")"></i>
+                        Ticket Verification
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert @(isValid ? "alert-success" : "alert-danger") mb-4">
+                        <h4><strong>@message</strong></h4>
+                    </div>
+
+                    @if (Model != null)
+                    {
+                        <!-- QR Code Display -->
+                        @if (!string.IsNullOrEmpty(qrCodeBase64))
+                        {
+                            <div class="mb-4">
+                                <img src="data:image/png;base64,@qrCodeBase64"
+                                     alt="QR Code"
+                                     class="img-fluid"
+                                     style="max-width: 300px; border: 3px solid #dee2e6; padding: 10px; background: white;" />
+                            </div>
+                        }
+
+                        <!-- Ticket Details -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-ticket-alt"></i> Ticket Details</h5>
+                            </div>
+                            <div class="card-body text-start">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Ticket Number</small>
+                                        <div><strong>Ticket #@Model.TicketNumber</strong></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Ticket ID</small>
+                                        <div><code>@Model.TicketId</code></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Tier</small>
+                                        <div><span class="badge bg-info">@Model.Tier</span></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Status</small>
+                                        <div><span class="@Model.GetStatusBadgeClass()">@Model.Status</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Information -->
+                        @if (Model.Event != null)
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Event Information</h5>
+                                </div>
+                                <div class="card-body text-start">
+                                    <h4>@Model.Event.Title</h4>
+                                    <p class="text-muted">@Model.Event.Description</p>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Event Date</small>
+                                            <div><strong>@Model.Event.StartDate.ToString("dd MMM yyyy HH:mm")</strong></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Category</small>
+                                            <div><strong>@Model.Event.Category</strong></div>
+                                        </div>
+                                    </div>
+
+                                    @if (Model.Event.Venue != null)
+                                    {
+                                        <div class="mt-3">
+                                            <small class="text-muted">Venue</small>
+                                            <div><strong>@Model.Event.Venue.Name</strong></div>
+                                            <div class="text-muted">@Model.Event.Venue.Location</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Customer Information -->
+                        @if (Model.User != null)
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5 class="mb-0"><i class="fas fa-user"></i> Customer Information</h5>
+                                </div>
+                                <div class="card-body text-start">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Name</small>
+                                            <div><strong>@Model.User.FirstName @Model.User.LastName</strong></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Email</small>
+                                            <div><strong>@Model.User.Email</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Scan Information -->
+                        @if (Model.IsScanned)
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="fas fa-qrcode"></i> Scan History</h5>
+                                </div>
+                                <div class="card-body text-start">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Scan Count</small>
+                                            <div><strong>@Model.ScanCount times</strong></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">First Scan</small>
+                                            <div><strong>@Model.FirstScannedAt?.ToString("dd MMM yyyy HH:mm")</strong></div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Last Scan</small>
+                                            <div><strong>@Model.LastScannedAt?.ToString("dd MMM yyyy HH:mm")</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Validity Information -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Created At</small>
+                                        <div>@Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</div>
+                                    </div>
+                                    @if (Model.ExpiresAt.HasValue)
+                                    {
+                                        <div class="col-md-6">
+                                            <small class="text-muted">Expires At</small>
+                                            <div>@Model.ExpiresAt.Value.ToString("dd MMM yyyy HH:mm")</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin/Staff Actions -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("Organizer"))
+                        {
+                            <div class="d-grid gap-2">
+                                @if (isValid && !Model.IsScanned)
+                                {
+                                    <form asp-action="Scan" method="post">
+                                        <input type="hidden" name="ticketId" value="@Model.TicketId" />
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-qrcode"></i> Mark as Scanned
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center">
+                <a href="/" class="btn btn-outline-primary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

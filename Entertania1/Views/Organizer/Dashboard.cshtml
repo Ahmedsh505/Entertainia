@@ -1,0 +1,472 @@
+﻿@using Entertania1.ViewModels.Organizer
+@model OrganizerDashboardStatsViewModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/OrganizerDashboard.css" />
+}
+
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fas"><i class="fas fa-chart-line"></i> Organizer Dashboard</h2>
+            <p class="text-muted">Welcome, @Model.OrganizerName</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("DownloadReport", "Organizer", new { period = Model.SelectedPeriod, language = "en", startDate = Model.SelectedPeriod == "custom" ? Model.FilterStartDate.ToString("yyyy-MM-dd") : null, endDate = Model.SelectedPeriod == "custom" ? Model.FilterEndDate.ToString("yyyy-MM-dd") : null })">
+                            <i class="fas fa-file-excel"></i> Full Report (English)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("DownloadReport", "Organizer", new { period = Model.SelectedPeriod, language = "ar", startDate = Model.SelectedPeriod == "custom" ? Model.FilterStartDate.ToString("yyyy-MM-dd") : null, endDate = Model.SelectedPeriod == "custom" ? Model.FilterEndDate.ToString("yyyy-MM-dd") : null })">
+                            <i class="fas fa-file-excel"></i> تقرير كامل (عربي)
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("DownloadMonthlyReport", "Organizer", new { language = "en" })">
+                            <i class="fas fa-calendar"></i> Monthly Report (English)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="@Url.Action("DownloadMonthlyReport", "Organizer", new { language = "ar" })">
+                            <i class="fas fa-calendar"></i> تقرير شهري (عربي)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Filter -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("Dashboard", new { period = "last7days" })"
+                                   class="btn btn-outline-primary @(Model.SelectedPeriod == "last7days" ? "active" : "")">Last 7 Days</a>
+                                <a href="@Url.Action("Dashboard", new { period = "last30days" })"
+                                   class="btn btn-outline-primary @(Model.SelectedPeriod == "last30days" ? "active" : "")">Last 30 Days</a>
+                                <a href="@Url.Action("Dashboard", new { period = "last6months" })"
+                                   class="btn btn-outline-primary @(Model.SelectedPeriod == "last6months" ? "active" : "")">Last 6 Months</a>
+                                <a href="@Url.Action("Dashboard", new { period = "lastyear" })"
+                                   class="btn btn-outline-primary @(Model.SelectedPeriod == "lastyear" ? "active" : "")">Last Year</a>
+                                <a href="@Url.Action("Dashboard", new { period = "alltime" })"
+                                   class="btn btn-outline-primary @(Model.SelectedPeriod == "alltime" ? "active" : "")">All Time</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <form asp-action="FilterByDateRange" method="get" class="row g-2" id="customDateForm">
+                                <div class="col-5">
+                                    <label class="form-label small">Start</label>
+                                    <input type="date"
+                                           id="startDateInput"
+                                           name="startDate"
+                                           class="form-control form-control-sm"
+                                           value="@(Model.SelectedPeriod == "custom" ? Model.FilterStartDate.ToString("yyyy-MM-dd") : "")" />
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label small">End</label>
+                                    <input type="date"
+                                           id="endDateInput"
+                                           name="endDate"
+                                           class="form-control form-control-sm"
+                                           value="@(Model.SelectedPeriod == "custom" ? Model.FilterEndDate.ToString("yyyy-MM-dd") : "")" />
+                                </div>
+                                <div class="col-2 align-self-end">
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                                        <i class="fas fa-filter"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    @if (Model.SelectedPeriod == "custom")
+                    {
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <div class="alert alert-info py-2 mb-0">
+                                    <i class="fas fa-info-circle"></i> Showing custom date range:
+                                    <strong>@Model.FilterStartDate.ToString("MMM dd, yyyy")</strong> to
+                                    <strong>@Model.FilterEndDate.ToString("MMM dd, yyyy")</strong>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow border-left-primary">
+                <div class="card-body text-center">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Events</div>
+                    <div class="h5 mb-0 font-weight-bold">@Model.Statistics.Overview.TotalEvents</div>
+                    <small class="text-success">@Model.Statistics.Overview.ApprovedEvents approved</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-left-success">
+                <div class="card-body text-center">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Revenue</div>
+                    <div class="h5 mb-0 font-weight-bold">$@Model.Statistics.Overview.TotalRevenue.ToString("N2")</div>
+                    <small class="text-success">+$@Model.Statistics.Overview.RevenueThisPeriod.ToString("N2") this period</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-left-info">
+                <div class="card-body text-center">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tickets Sold</div>
+                    <div class="h5 mb-0 font-weight-bold">@Model.Statistics.Overview.TotalTicketsSold</div>
+                    <small class="text-info">+@Model.Statistics.Overview.TicketsSoldThisPeriod this period</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-left-warning">
+                <div class="card-body text-center">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Venues</div>
+                    <div class="h5 mb-0 font-weight-bold">@Model.Statistics.Overview.TotalVenues</div>
+                    <small class="text-warning">@Model.Statistics.Venues.ApprovedVenues approved</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2">
+                            <h6>Gross Revenue</h6>
+                            <h4 class="text-success">${@Model.Statistics.Financials.GrossRevenue.ToString("N2")}</h4>
+                            <small class="text-muted">+${@Model.Statistics.Financials.GrossRevenueThisPeriod.ToString("N2")}</small>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Tax Collected</h6>
+                            <h4 class="text-warning">${@Model.Statistics.Financials.TotalTaxCollected.ToString("N2")}</h4>
+                            <small class="text-muted">+${@Model.Statistics.Financials.TaxCollectedThisPeriod.ToString("N2")}</small>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Discounts</h6>
+                            <h4 class="text-info">${@Model.Statistics.Financials.TotalDiscounts.ToString("N2")}</h4>
+                            <small class="text-muted">+${@Model.Statistics.Financials.DiscountsThisPeriod.ToString("N2")}</small>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Refunded</h6>
+                            <h4 class="text-danger">${@Model.Statistics.Financials.TotalRefunded.ToString("N2")}</h4>
+                            <small class="text-muted">@Model.Statistics.Financials.TotalRefundedTickets tickets</small>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Avg Ticket Price</h6>
+                            <h4 class="text-primary">${@Model.Statistics.Financials.AverageTicketPrice.ToString("N2")}</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Net Profit</h6>
+                            <h4 class="text-success fw-bold">${@Model.Statistics.Financials.NetProfit.ToString("N2")}</h4>
+                            <small class="text-muted">+${@Model.Statistics.Financials.NetProfitThisPeriod.ToString("N2")}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Revenue Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Tickets Sold</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ticketsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Performance & Bookings -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Performing Events</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event Title</th>
+                                <th>Category</th>
+                                <th class="text-end">Revenue</th>
+                                <th class="text-end">Tickets</th>
+                                <th class="text-end">Occupancy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var evt in Model.Statistics.TopPerformingEvents.Take(5))
+                            {
+                                <tr>
+                                    <td>@evt.EventTitle</td>
+                                    <td><span class="badge bg-info">@evt.Category</span></td>
+                                    <td class="text-end">$@evt.TotalRevenue.ToString("N2")</td>
+                                    <td class="text-end">@evt.TicketsSold</td>
+                                    <td class="text-end">
+                                        <div class="progress" style="width: 80px; height: 20px;">
+                                            <div class="progress-bar @(evt.OccupancyRate > 80 ? "bg-success" : evt.OccupancyRate > 50 ? "bg-warning" : "bg-danger")"
+                                                 style="width: @evt.OccupancyRate%">
+                                                @evt.OccupancyRate.ToString("F0")%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">Booking Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr><td>Total Bookings:</td><td class="text-end"><strong>@Model.Statistics.Bookings.TotalBookings</strong></td></tr>
+                        <tr><td>Confirmed:</td><td class="text-end text-success">@Model.Statistics.Bookings.ConfirmedBookings</td></tr>
+                        <tr><td>Refunded:</td><td class="text-end text-danger">@Model.Statistics.Bookings.RefundedBookings</td></tr>
+                        <tr><td>Conversion Rate:</td><td class="text-end">@Model.Statistics.Bookings.BookingConversionRate.ToString("F2")%</td></tr>
+                    </table>
+                    <hr />
+                    <h6>Tickets by Tier</h6>
+                    @foreach (var tier in Model.Statistics.Bookings.TicketsByTier)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>@tier.Key:</span>
+                            <span class="badge bg-secondary">@tier.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">Event Status</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr><td>Upcoming:</td><td class="text-end text-success">@Model.Statistics.Events.UpcomingEvents</td></tr>
+                        <tr><td>Ongoing:</td><td class="text-end text-primary">@Model.Statistics.Events.OngoingEvents</td></tr>
+                        <tr><td>Completed:</td><td class="text-end text-muted">@Model.Statistics.Events.CompletedEvents</td></tr>
+                        <tr><td>Pending Approval:</td><td class="text-end text-warning">@Model.Statistics.Events.PendingEvents</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">Events by Category</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var cat in Model.Statistics.Events.EventsByCategory)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>@cat.Key:</span>
+                            <span class="badge bg-primary">@cat.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">Venue Information</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr><td>Total Venues:</td><td class="text-end">@Model.Statistics.Venues.TotalVenues</td></tr>
+                        <tr><td>Approved:</td><td class="text-end text-success">@Model.Statistics.Venues.ApprovedVenues</td></tr>
+                        <tr><td>Pending:</td><td class="text-end text-warning">@Model.Statistics.Venues.PendingVenues</td></tr>
+                        <tr><td>Currently Occupied:</td><td class="text-end text-info">@Model.Statistics.Venues.CurrentlyOccupiedVenues</td></tr>
+                    </table>
+                    @if (!string.IsNullOrEmpty(Model.Statistics.Venues.MostUsedVenueName))
+                    {
+                        <hr />
+                        <small><strong>Most Used:</strong> @Model.Statistics.Venues.MostUsedVenueName (@Model.Statistics.Venues.MostUsedVenueEventCount events)</small>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        // Date validation
+        const form = document.getElementById('customDateForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const startDateInput = document.getElementById('startDateInput');
+                const endDateInput = document.getElementById('endDateInput');
+
+                if (!startDateInput.value || !endDateInput.value) {
+                    e.preventDefault();
+                    alert('Please select both start and end dates');
+                    return false;
+                }
+
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                const today = new Date();
+                today.setHours(23, 59, 59, 999); // End of today
+
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    e.preventDefault();
+                    alert('Invalid date format');
+                    return false;
+                }
+
+                if (startDate > endDate) {
+                    e.preventDefault();
+                    alert('Start date cannot be after end date');
+                    return false;
+                }
+
+                if (endDate > today) {
+                    e.preventDefault();
+                    alert('End date cannot be in the future');
+                    return false;
+                }
+            });
+        }
+
+        const revenueLabels = @Html.Raw(Json.Serialize(Model.Statistics.RevenueTimeSeries.Select(t => t.Label)));
+        const revenueData = @Html.Raw(Json.Serialize(Model.Statistics.RevenueTimeSeries.Select(t => t.Value)));
+
+        const ticketsLabels = @Html.Raw(Json.Serialize(Model.Statistics.TicketsTimeSeries.Select(t => t.Label)));
+        const ticketsData = @Html.Raw(Json.Serialize(Model.Statistics.TicketsTimeSeries.Select(t => t.Value)));
+
+        // Revenue Chart
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: revenueData,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: context => 'Revenue: $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2})
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '$' + value.toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+
+        // Tickets Chart
+        new Chart(document.getElementById('ticketsChart'), {
+            type: 'bar',
+            data: {
+                labels: ticketsLabels,
+                datasets: [{
+                    label: 'Tickets Sold',
+                    data: ticketsData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: context => 'Tickets: ' + context.parsed.y.toLocaleString()
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

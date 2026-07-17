@@ -1,0 +1,534 @@
+﻿@model Entertania1.ViewModels.Venue.VenueListVM
+@using System.Security.Claims
+@using Core.Enums
+@using Core.Helpers
+
+@{
+    ViewData["Title"] = "Venues";
+    var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var isAdmin = userRole == "Admin";
+    var isOrganizer = userRole == "Organizer";
+    var governorates = GovernorateHelper.GetGovernorateList(includeArabic: true);
+    var selectedGovernorate = ViewBag.SelectedGovernorate as int?;
+
+    var venuePhotos = ViewBag.VenuePhotos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+    var venueVideos = ViewBag.VenueVideos as Dictionary<int, List<string>> ?? new Dictionary<int, List<string>>();
+
+    var totalVenues = Model.Venues?.Count() ?? 0;
+    var approvedCount = Model.Venues?.Count(v => v.ApprovalStatus == ApprovalStatus.Approved) ?? 0;
+    var pendingCount = Model.Venues?.Count(v => v.ApprovalStatus == ApprovalStatus.Pending) ?? 0;
+}
+
+<link rel="stylesheet" href="~/css/Venue/VenueIndex.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container-fluid mt-4">
+
+    <!-- Hero Stats Section -->
+    <div class="venue-hero">
+        <div class="container">
+            <h1><i class="fas fa-building"></i> Venues</h1>
+            <p class="venue-hero-subtitle">Discover and manage amazing venues for your events</p>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-icon">🏛️</span>
+                    <span class="stat-value">@totalVenues</span>
+                    <span class="stat-label">Total Venues</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-value">@approvedCount</span>
+                    <span class="stat-label">Approved</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">⏳</span>
+                    <span class="stat-value">@pendingCount</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📍</span>
+                    <span class="stat-value">@governorates.Count</span>
+                    <span class="stat-label">Governorates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <form asp-action="Index" method="get" id="filterForm">
+            <div class="filter-controls">
+                <!-- Search & Filters Column -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-search"></i> Search & Filter
+                    </label>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text"
+                               name="searchTerm"
+                               value="@Model.SearchTerm"
+                               class="search-input"
+                               placeholder="Search venues by name or location..." />
+                        <button type="submit" class="btn-search">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
+                        <!-- Governorate Filter -->
+                        <div style="flex: 1;">
+                            <select id="governorateFilter"
+                                    name="governorate"
+                                    class="select2-governorate-filter"
+                                    style="width: 100%;">
+                                <option value="">All Governorates</option>
+                                @foreach (var gov in governorates)
+                                {
+                                    <option value="@gov.Key"
+                                            selected="@(selectedGovernorate == gov.Key ? "selected" : null)">
+                                        @gov.Value
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <div style="flex: 1;">
+                            <select name="sortOrder" class="sort-dropdown" onchange="this.form.submit()">
+                                <option value="">Sort: Default</option>
+                                <option value="name_desc" selected="@(Model.SortOrder == "name_desc" ? "selected" : null)">
+                                    Name (Z-A)
+                                </option>
+                                <option value="capacity" selected="@(Model.SortOrder == "capacity" ? "selected" : null)">
+                                    Capacity (Low-High)
+                                </option>
+                                <option value="capacity_desc" selected="@(Model.SortOrder == "capacity_desc" ? "selected" : null)">
+                                    Capacity (High-Low)
+                                </option>
+                                <option value="governorate" selected="@(Model.SortOrder == "governorate" ? "selected" : null)">
+                                    Governorate (A-Z)
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Toggle -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i class="fas fa-eye"></i> View Mode
+                    </label>
+                    <div class="view-toggle">
+                        <button type="button" class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i> Grid
+                        </button>
+                        <button type="button" class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i> List
+                        </button>
+                        <button type="button" class="view-btn" data-view="map">
+                            <i class="fas fa-map"></i> Map
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Venue Button -->
+                @if (isOrganizer || isAdmin)
+                {
+                    <div class="filter-group">
+                        <label class="filter-label" style="opacity: 0;">Action</label>
+                        <a asp-action="Create" class="btn-add-venue">
+                            <i class="fas fa-plus-circle"></i> Add Venue
+                        </a>
+                    </div>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Active Filters Display -->
+@if (!string.IsNullOrEmpty(Model.SearchTerm) || selectedGovernorate.HasValue)
+{
+        <div class="active-filters">
+            <strong style="color: var(--egyptian-blue);">
+                <i class="fas fa-filter"></i> Active Filters:
+            </strong>
+
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <span class="filter-chip">
+                    <i class="fas fa-search"></i>
+                    Search: "@Model.SearchTerm"
+                    <button type="button"
+                            class="filter-chip-remove"
+                            onclick="removeFilter('searchTerm')">
+                        ×
+                    </button>
+                </span>
+            }
+
+            @if (selectedGovernorate.HasValue)
+            {
+                <span class="filter-chip">
+                    <i class="fas fa-map-marker-alt"></i>
+                    @governorates[selectedGovernorate.Value]
+                    <button type="button"
+                            class="filter-chip-remove"
+                            onclick="removeFilter('governorate')">
+                        ×
+                    </button>
+                </span>
+            }
+
+            <button type="button"
+                    class="clear-all-filters"
+                    onclick="clearAllFilters()">
+                <i class="fas fa-times-circle"></i> Clear All
+            </button>
+        </div>
+}
+
+<!-- Grid View -->
+    <div class="venues-grid active" id="gridView">
+        @if (Model.Venues != null && Model.Venues.Any())
+        {
+            foreach (var venue in Model.Venues)
+            {
+                var photos = venuePhotos.ContainsKey(venue.VenueId) ? venuePhotos[venue.VenueId] : new List<string>();
+                var videos = venueVideos.ContainsKey(venue.VenueId) ? venueVideos[venue.VenueId] : new List<string>();
+                var totalMedia = photos.Count + videos.Count;
+
+                <div class="venue-card">
+                    <!-- Photo Carousel -->
+                    <div class="venue-photo-carousel" data-venue-id="@venue.VenueId">
+                        @if (totalMedia > 0)
+                        {
+                            @foreach (var photo in photos)
+                            {
+                                <img src="@photo" class="venue-media venue-photo" data-type="photo" alt="@venue.Name" />
+                            }
+                            @foreach (var video in videos)
+                            {
+                                <div class="venue-media venue-video-container" data-type="video">
+                                    <video class="venue-video" preload="metadata">
+                                        <source src="@video" type="video/mp4">
+                                    </video>
+                                    <div class="video-play-icon">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="venue-photo-placeholder">
+                                <i class="fas fa-building fa-5x"></i>
+                                <p class="mt-3">No media available</p>
+                            </div>
+                        }
+
+                        @if (totalMedia > 1)
+                        {
+                            <button class="carousel-btn carousel-prev" 
+                                    onclick="prevVenueMedia(@venue.VenueId)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-btn carousel-next" 
+                                    onclick="nextVenueMedia(@venue.VenueId)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="carousel-indicators">
+                                @for (int i = 0; i < totalMedia; i++)
+                                {
+                                    <span class="indicator @(i==0?"active":"")" 
+                                          onclick="goToVenueMedia(@venue.VenueId,@i)"></span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="venue-status-badge">
+                        @if (venue.ApprovalStatus == ApprovalStatus.Approved)
+                        {
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Approved
+                            </span>
+                        }
+                        else if (venue.ApprovalStatus == ApprovalStatus.Pending)
+                        {
+                            <span class="badge bg-warning">
+                                <i class="fas fa-clock"></i> Pending
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times-circle"></i> Rejected
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="venue-card-body">
+                        <h5 class="venue-title">@venue.Name</h5>
+                        
+                        <div class="venue-meta">
+                            <div class="meta-item governorate-badge">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span class="badge">
+                                    @GovernorateHelper.GetDisplayName(venue.Governorate)
+                                </span>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@venue.Location</span>
+                            </div>
+                            
+                            <div class="meta-item">
+                                <i class="fas fa-users"></i>
+                                <span>Capacity: @venue.Capacity.ToString("N0")</span>
+                            </div>
+                            
+                            @if (venue.Latitude.HasValue && venue.Longitude.HasValue)
+                            {
+                                <div class="meta-item">
+                                    <i class="fas fa-compass"></i>
+                                    <span>
+                                        GPS: @venue.Latitude.Value.ToString("F4"), 
+                                        @venue.Longitude.Value.ToString("F4")
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="venue-actions">
+                            <a asp-action="Details" 
+                               asp-route-id="@venue.VenueId" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-info-circle"></i> Details
+                            </a>
+                            
+                            @if (isAdmin || (isOrganizer && venue.CreatedByUserId == int.Parse(User.FindFirst("UserId")?.Value ?? "0")))
+                            {
+                                <a asp-action="Edit" 
+                                   asp-route-id="@venue.VenueId" 
+                                   class="btn btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-danger" 
+                                        onclick="confirmDelete(@venue.VenueId, '@venue.Name')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-building empty-state-icon"></i>
+                    <h4>No Venues Found</h4>
+                    <p>Try adjusting your filters or create a new venue</p>
+                    @if (isOrganizer || isAdmin)
+                    {
+                        <a asp-action="Create" class="btn-add-venue">
+                            <i class="fas fa-plus-circle"></i> Create First Venue
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- List View -->
+    <div class="venues-list" id="listView">
+        @if (Model.Venues != null && Model.Venues.Any())
+        {
+            foreach (var venue in Model.Venues)
+            {
+                var photos = venuePhotos.ContainsKey(venue.VenueId) ? venuePhotos[venue.VenueId] : new List<string>();
+                var videos = venueVideos.ContainsKey(venue.VenueId) ? venueVideos[venue.VenueId] : new List<string>();
+                var totalMedia = photos.Count + videos.Count;
+
+                <div class="venue-card-list">
+                    <div class="venue-photo-carousel" data-venue-id="@venue.VenueId-list">
+                        @if (totalMedia > 0)
+                        {
+                            @if (photos.Any())
+                            {
+                                <img src="@photos.First()" class="venue-media active" data-type="photo" alt="@venue.Name" />
+                            }
+                            else if (videos.Any())
+                            {
+                                <div class="venue-media venue-video-container active" data-type="video">
+                                    <video class="venue-video" preload="metadata">
+                                        <source src="@videos.First()" type="video/mp4">
+                                    </video>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="venue-photo-placeholder">
+                                <i class="fas fa-building fa-3x"></i>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="venue-card-body">
+                        <div class="venue-status-badge" style="position: static; margin-bottom: 0.75rem;">
+                            @if (venue.ApprovalStatus == ApprovalStatus.Approved)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                            }
+                            else if (venue.ApprovalStatus == ApprovalStatus.Pending)
+                            {
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times-circle"></i> Rejected
+                                </span>
+                            }
+                        </div>
+
+                        <h5 class="venue-title">@venue.Name</h5>
+                        
+                        <div class="venue-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>@GovernorateHelper.GetDisplayName(venue.Governorate)</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@venue.Location</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-users"></i>
+                                <span>Capacity: @venue.Capacity.ToString("N0")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="venue-actions">
+                        <a asp-action="Details" 
+                           asp-route-id="@venue.VenueId" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        
+                        @if (isAdmin || (isOrganizer && venue.CreatedByUserId == int.Parse(User.FindFirst("UserId")?.Value ?? "0")))
+                        {
+                            <a asp-action="Edit" 
+                               asp-route-id="@venue.VenueId" 
+                               class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-danger" 
+                                    onclick="confirmDelete(@venue.VenueId, '@venue.Name')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Map View -->
+    <div class="map-view" id="mapView">
+        <div id="venueMap"></div>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i==Model.CurrentPage?"active":"")">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-page="@i" 
+                           asp-route-searchTerm="@Model.SearchTerm" 
+                           asp-route-governorate="@selectedGovernorate" 
+                           asp-route-sortOrder="@Model.SortOrder">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the venue:</p>
+                <strong id="venueNameToDelete" style="color: var(--danger-red);"></strong>
+                <p class="mt-3 text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Venue
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="~/js/venue-index.js"></script>
+    
+    <script>
+        // Pass venue data to JS
+        window.venuesData = @Html.Raw(Json.Serialize(
+            Model.Venues != null 
+                ? Model.Venues.Select(v => new {
+                    id = v.VenueId,
+                    name = v.Name,
+                    location = v.Location,
+                    governorate = GovernorateHelper.GetDisplayName(v.Governorate),
+                    capacity = v.Capacity,
+                    lat = v.Latitude,
+                    lng = v.Longitude,
+                    status = v.ApprovalStatus.ToString()
+                }).ToList()
+                : new List<dynamic>()
+        ));
+    </script>
+}

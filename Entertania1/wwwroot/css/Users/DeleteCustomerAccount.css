@@ -1,0 +1,92 @@
+﻿/* ============================================
+   DELETE CUSTOMER ACCOUNT — Egyptian Light Theme
+   ============================================ */
+:root {
+    --gold: #C59D5F;
+    --gold-dark: #b38c4f;
+    --egyptian-blue: #0B3A6A;
+    --egyptian-blue-light: #0f4c8c;
+    --offwhite: #f9f7f3;
+    --offwhite-2: #fffdf9;
+    --dark-text: #2a2a2a;
+    --muted-text: #6f6f6f;
+    --card-bg: #ffffffdd;
+    --card-border: rgba(197,157,95,0.3);
+    --shadow-soft: 0 6px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+body {
+    background: var(--offwhite);
+    color: var(--dark-text);
+}
+
+/* ---------- CARD ---------- */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-soft);
+    transition: 0.3s;
+}
+
+/* ---------- HEADINGS ---------- */
+h2.text-danger {
+    color: var(--egyptian-blue);
+}
+
+    h2.text-danger i {
+        color: var(--gold);
+    }
+
+/* ---------- ALERTS ---------- */
+.alert {
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+}
+
+.alert-warning {
+    background: #fff4e5;
+    color: var(--dark-text);
+    border-left: 6px solid var(--gold);
+}
+
+.alert-danger {
+    background: #fde2e2;
+    color: var(--dark-text);
+    border-left: 6px solid #dc3545;
+}
+
+.alert-success {
+    background: #e6f4ea;
+    color: var(--dark-text);
+    border-left: 6px solid #198754;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn-secondary {
+    background: #adb5bd;
+    color: #fff;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+    .btn-secondary:hover {
+        background: #6c757d;
+    }
+
+.btn-danger {
+    background: var(--gold);
+    color: #fff;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+    .btn-danger:hover {
+        background: var(--gold-dark);
+    }
+
+/* ---------- LAYOUT ---------- */
+.container {
+    padding-top: 2rem;
+}

@@ -1,0 +1,54 @@
+﻿@using Core.Models.EventModels
+@model SportEvent
+
+@if (Model != null)
+{
+    <div class="info-card fade-in">
+        <div class="card-header-custom">
+            <h3 class="section-title">
+                <i class="fas fa-trophy"></i>
+                Sport Event Details
+            </h3>
+        </div>
+        <div class="card-body-custom">
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-futbol"></i>
+                    Sport Type
+                </div>
+                <div class="info-content">@Model.SportType</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-shield-alt"></i>
+                    Team A
+                </div>
+                <div class="info-content">@Model.TeamA</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-shield-alt"></i>
+                    Team B
+                </div>
+                <div class="info-content">@Model.TeamB</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-label">
+                    <i class="fas fa-medal"></i>
+                    League
+                </div>
+                <div class="info-content">@Model.LeagueName</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="fas fa-trophy"></i>
+        <p>No sport event details available</p>
+    </div>
+}

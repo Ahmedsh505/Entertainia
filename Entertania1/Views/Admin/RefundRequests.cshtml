@@ -1,0 +1,386 @@
+﻿@model List<Core.Models.PaymentModels.Refund>
+
+@{
+    ViewData["Title"] = "Refund Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/Admin/RefundRequests.css" />
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>
+                <i class="fas fa-undo-alt"></i> Pending Refund Requests
+            </h2>
+            <p class="text-muted">Review and process customer refund requests</p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No pending refund requests at this time.
+        </div>
+        <a asp-action="Dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table">
+                            <tr>
+                                <th>Refund ID</th>
+                                <th>Customer</th>
+                                <th>Event</th>
+                                <th>Original Amount</th>
+                                <th>Refund Amount</th>
+                                <th>Requested Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var refund in Model)
+                            {
+                                var modalApproveId = $"approveModal{refund.RefundId}";
+                                var modalRejectId = $"rejectModal{refund.RefundId}";
+
+                                <tr>
+                                    <td><strong>#@refund.RefundId</strong></td>
+
+                                    <td>
+                                        @if (refund.RequestedBy != null)
+                                        {
+                                            <div><strong>@refund.RequestedBy.FirstName @refund.RequestedBy.LastName</strong></div>
+                                            <small class="text-muted">@refund.RequestedBy.Email</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (refund.Booking?.Event != null)
+                                        {
+                                            <div><strong>@refund.Booking.Event.Title</strong></div>
+                                            <small class="text-muted">Booking #@refund.BookingId</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+
+                                    <td><strong>@refund.OriginalAmount.ToString("N2") @refund.Currency</strong></td>
+
+                                    <td>
+                                        <span class="badge bg-success">@refund.RefundAmount.ToString("N2") @refund.Currency</span>
+                                        <small class="text-muted d-block">(@refund.RefundPercentage%)</small>
+                                    </td>
+
+                                    <td>
+                                        @refund.RequestedAt.ToString("MMM dd, yyyy")
+                                        <small class="text-muted d-block">@refund.RequestedAt.ToString("hh:mm tt")</small>
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(refund.Reason))
+                                        {
+                                            <span data-bs-toggle="tooltip" title="@refund.Reason">
+                                                @(refund.Reason.Length > 30 ? refund.Reason.Substring(0, 30) + "..." : refund.Reason)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No reason provided</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="@refund.GetStatusBadgeClass()">
+                                            @refund.GetStatusText()
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="btn-group" role="group">
+
+                                            <a asp-action="RefundDetails" asp-route-id="@refund.RefundId"
+                                               class="btn btn-sm btn-info"
+                                               data-bs-toggle="tooltip"
+                                               title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <button class="btn btn-sm btn-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#@modalApproveId"
+                                                    title="Approve Refund">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+
+                                            <button class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#@modalRejectId"
+                                                    title="Reject Refund">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a asp-action="Dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Go To Management
+            </a>
+        </div>
+    }
+</div>
+
+<!-- =============================== -->
+<!-- MODALS SECTION (OUTSIDE LOOP) -->
+<!-- =============================== -->
+@if (Model != null && Model.Any())
+{
+    @foreach (var refund in Model)
+    {
+        var modalApproveId = $"approveModal{refund.RefundId}";
+        var modalRejectId = $"rejectModal{refund.RefundId}";
+
+        <!-- =============================== -->
+        <!-- APPROVE REFUND MODAL -->
+        <!-- =============================== -->
+
+        <div class="modal fade" id="@modalApproveId" tabindex="-1" aria-labelledby="@(modalApproveId)Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="@(modalApproveId)Label">
+                            <i class="fas fa-check-circle"></i> Approve Refund
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form asp-action="ApproveRefund" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-body">
+                            <input type="hidden" name="refundId" value="@refund.RefundId" />
+
+                            <div class="alert alert-info">
+                                <strong>Refund Details:</strong><br />
+                                Customer: @refund.RequestedBy?.FirstName @refund.RequestedBy?.LastName<br />
+                                Amount:
+                                <strong>@refund.RefundAmount.ToString("N2") @refund.Currency</strong>
+                            </div>
+
+                            <p>
+                                <i class="fas fa-info-circle text-warning"></i>
+                                <strong>Important:</strong> Approving this refund will immediately process the refund through Paymob.
+                                The customer will receive
+                                <strong>@refund.RefundAmount.ToString("N2") @refund.Currency</strong>
+                                in 1–14 business days.
+                            </p>
+
+                            <div class="mb-3">
+                                <label class="form-label">Admin Note (Optional)</label>
+                                <textarea name="adminNote"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Add any notes about this approval..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Approve & Process Refund
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================== -->
+        <!-- REJECT REFUND MODAL -->
+        <!-- =============================== -->
+
+        <div class="modal fade" id="@modalRejectId" tabindex="-1" aria-labelledby="@(modalRejectId)Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="@(modalRejectId)Label">
+                            <i class="fas fa-times-circle"></i> Reject Refund
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form asp-action="RejectRefund" asp-route-returnUrl="@Url.Action("RefundRequests")" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-body">
+                            <input type="hidden" name="refundId" value="@refund.RefundId" />
+
+                            <div class="alert alert-warning">
+                                <strong>Refund Details:</strong><br />
+                                Customer: @refund.RequestedBy?.FirstName @refund.RequestedBy?.LastName<br />
+                                Amount:
+                                <strong>@refund.RefundAmount.ToString("N2") @refund.Currency</strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Rejection Reason <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="rejectionReason"
+                                  class="form-control"
+                                  rows="4"
+                                  required
+                                  placeholder="Please provide a clear reason for rejecting this refund..."></textarea>
+
+                                <small class="text-muted">This reason will be sent to the customer via email.</small>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Reject Refund
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <style>
+        /* Fix modal z-index and visibility issues */
+        .modal-backdrop {
+            z-index: 1040 !important;
+            opacity: 0.5 !important;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+            .modal.show {
+                display: block !important;
+            }
+
+        .modal-dialog {
+            z-index: 1060 !important;
+            position: relative;
+        }
+
+        .modal-content {
+            position: relative;
+            z-index: 1061 !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ensure modal is fully visible */
+        .modal.show .modal-dialog {
+            transform: translate(0, 0) !important;
+        }
+    </style>
+
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Ensure modals work properly with enhanced visibility
+            var modalElements = document.querySelectorAll('.modal');
+            modalElements.forEach(function(modalEl) {
+
+                modalEl.addEventListener('show.bs.modal', function (e) {
+                    // Force higher z-index immediately
+                    modalEl.style.zIndex = '1055';
+                    modalEl.style.display = 'block';
+
+                    setTimeout(function() {
+                        var backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) {
+                            backdrop.style.zIndex = '1040';
+                            backdrop.style.opacity = '0.5';
+                        }
+
+                        var modalDialog = modalEl.querySelector('.modal-dialog');
+                        if (modalDialog) {
+                            modalDialog.style.zIndex = '1060';
+                        }
+
+                        var modalContent = modalEl.querySelector('.modal-content');
+                        if (modalContent) {
+                            modalContent.style.zIndex = '1061';
+                        }
+                    }, 50);
+                });
+
+                modalEl.addEventListener('shown.bs.modal', function () {
+                    // Ensure everything is properly layered after animation
+                    modalEl.style.zIndex = '1055';
+                    var modalDialog = modalEl.querySelector('.modal-dialog');
+                    var modalContent = modalEl.querySelector('.modal-content');
+
+                    if (modalDialog) modalDialog.style.zIndex = '1060';
+                    if (modalContent) modalContent.style.zIndex = '1061';
+                });
+
+                // Clean up when modal closes
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    var backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(function(backdrop) {
+                        backdrop.remove();
+                    });
+                });
+            });
+        });
+    </script>
+}

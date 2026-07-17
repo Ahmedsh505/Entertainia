@@ -1,0 +1,581 @@
+﻿/* General Layout & Background - Egyptian Theme */
+.root {
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+}
+body {
+    background-color: #f9f7f3; /* Ivory/Light Beige - earthy, warm background */
+    font-family: 'Lora', serif; /* A more elegant, serif font for an ancient feel */
+    color: #333;
+    line-height: 1.6;
+}
+
+.booking-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px; /* Slightly more padding for a richer feel */
+    background-color: #ffffff;
+    border-radius: 15px; /* Softer, more elegant corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Deeper shadow for luxury */
+    border: 1px solid #e0e0e0; /* Subtle border */
+}
+
+/* Header & Status Badge - Egyptian Theme */
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #C59D5F; /* Gold border line */
+    position: relative;
+}
+
+    /* Decorative element below the border */
+    .booking-header::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        border-radius: 2px;
+    }
+
+    .booking-header h2 {
+        color: #0B3A6A; /* Deep Egyptian Blue for main title */
+        font-family: 'Playfair Display', serif; /* More grand font for titles */
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+
+        .booking-header h2 i {
+            color: #C59D5F; /* Gold icon */
+            font-size: 1.8em; /* Larger icon */
+            margin-right: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+    .booking-header .text-muted {
+        font-size: 0.95em;
+        color: #666;
+    }
+
+/* Status Badges - Egyptian Theme */
+.booking-status-badge {
+    padding: 10px 18px; /* Larger padding */
+    border-radius: 25px; /* More rounded, pill-like */
+    font-weight: bold;
+    text-transform: capitalize; /* More natural capitalization */
+    font-size: 0.9em;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for badges */
+}
+
+/* Specific badge colors inspired by Egyptian palette */
+.badge-confirmed {
+    background-color: #4CAF50; /* Turquoise Green for success */
+    color: #fff;
+}
+
+.badge-pendingpayment {
+    background-color: #C59D5F; /* Gold for pending payment */
+    color: #0B3A6A; /* Deep blue text on gold */
+}
+
+.badge-cancelled, .badge-refund-rejected { /* Corrected class name */
+    background-color: #E74C3C; /* Sunset Red for danger/cancellation */
+    color: #fff;
+}
+
+.badge-pending, .badge-pending-refund {
+    background-color: #0B3A6A; /* Deep Egyptian Blue for pending/info */
+    color: #fff;
+}
+
+.badge-refunded {
+    background-color: #2ECC71; /* A softer green for refunded */
+    color: #fff;
+}
+
+/* Main Content Layout (Two Columns) - Egyptian Theme */
+.booking-main {
+    display: flex;
+    gap: 40px; /* More space for grandeur */
+}
+
+.booking-left {
+    flex: 3;
+    min-width: 60%;
+}
+
+.booking-right {
+    flex: 2;
+    min-width: 35%;
+}
+
+/* Cards (Sections) - Egyptian Theme */
+.booking-card {
+    background-color: #ffffff;
+    border: 1px solid #f0e6d2; /* Light gold/sandy border */
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px; /* More spacing */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Refined shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .booking-card:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    }
+
+.booking-card-header {
+    padding: 18px 25px;
+    color: #fff;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    position: relative; /* For decorative line */
+}
+
+    .booking-card-header::after { /* Small gold line under header */
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 25px;
+        width: 50px;
+        height: 3px;
+        background-color: #C59D5F; /* Gold accent */
+        border-radius: 2px;
+    }
+
+    .booking-card-header h5, .booking-card-header h6 {
+        margin: 0;
+        font-size: 1.2em; /* Slightly larger headers */
+        font-family: 'Playfair Display', serif;
+    }
+
+    .booking-card-header i {
+        margin-right: 12px;
+        font-size: 1.3em;
+    }
+
+.booking-card-body {
+    padding: 25px;
+}
+
+/* Color Classes for Headers (Egyptian Theme) */
+.bg-primary {
+    background-color: #0B3A6A;
+}
+/* Deep Egyptian Blue */
+.bg-success {
+    background-color: #4CAF50;
+}
+/* Turquoise Green */
+.bg-warning {
+    background-color: #C59D5F;
+    color: #0B3A6A !important;
+}
+/* Gold background, blue text */
+.bg-danger {
+    background-color: #E74C3C;
+}
+/* Sunset Red */
+.bg-dark {
+    background-color: #343a40;
+}
+/* Keep dark for contrast/summary */
+.bg-light {
+    background-color: #f0e6d2;
+    color: #0B3A6A !important;
+}
+/* Light sandy color */
+
+/* Event Details Grid - Egyptian Theme */
+.booking-event-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.booking-event-item {
+    flex: 1 1 48%; /* Slightly adjusted flex for cleaner wrap */
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee; /* Dashed separator */
+}
+
+    .booking-event-item:last-child,
+    .booking-event-item.col-12:last-child {
+        border-bottom: none; /* No border for the last item */
+    }
+
+
+    .booking-event-item i {
+        color: #C59D5F; /* Gold icons for details */
+        font-size: 1.3em;
+        margin-right: 20px;
+        padding-top: 3px;
+        text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-event-item small {
+        display: block;
+        font-size: 0.88em;
+        color: #888;
+        margin-bottom: 3px;
+    }
+
+    .booking-event-item strong {
+        color: #0B3A6A; /* Deep blue for strong text */
+        font-family: 'Open Sans', sans-serif; /* Readable font for details */
+    }
+
+    .booking-event-item .col-12 {
+        flex: 1 1 100%;
+    }
+
+/* Buttons - Egyptian Theme */
+.booking-btn {
+    display: inline-block;
+    padding: 12px 25px; /* Larger padding */
+    border-radius: 8px; /* Softer edges */
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.5px; /* Slightly spaced letters */
+    border-color: #C59D3B;
+    color: #0B3A6A;
+}
+
+    .booking-btn i {
+        margin-right: 8px;
+    }
+
+    .booking-btn:hover {
+        transform: translateY(-2px); /* Subtle lift */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        opacity: 1; /* Ensure full opacity */
+        color: #ffffff;
+        background-color: #C59D3B;
+    }
+.booking-card-header {
+    background-color: #0B3A6A;
+}
+/* Primary buttons with gold/blue gradient */
+.booking-btn-primary,
+.booking-btn-warning { /* Use warning for primary actions like Complete Payment */
+    background: linear-gradient(to right, #C59D5F, #E0C28A); /* Gold gradient */
+    color: #0B3A6A; /* Deep Egyptian Blue text */
+    border-color: #C59D5F;
+}
+
+    .booking-btn-primary:hover,
+    .booking-btn-warning:hover {
+        background: linear-gradient(to right, #E0C28A, #C59D5F); /* Reverse gradient on hover */
+        color: #fff; /* White text on hover for contrast */
+    }
+
+
+.booking-btn-outline-primary {
+    color: #0B3A6A;
+    background-color: transparent;
+    border-color: #C59D5F; /* Gold border */
+}
+
+    .booking-btn-outline-primary:hover {
+        color: #fff;
+        background-color: #0B3A6A; /* Deep blue fill */
+        border-color: #0B3A6A;
+    }
+
+.booking-btn-outline-danger {
+    color: #E74C3C;
+    background-color: transparent;
+    border-color: #E74C3C;
+}
+
+    .booking-btn-outline-danger:hover {
+        color: #fff;
+        background-color: #E74C3C;
+    }
+
+.booking-btn-outline-secondary {
+    color: #666;
+    background-color: transparent;
+    border-color: #ccc;
+}
+
+    .booking-btn-outline-secondary:hover {
+        color: #0B3A6A;
+        background-color: #f0f0f0;
+        border-color: #0B3A6A;
+    }
+
+/* Alerts and Messages - Egyptian Theme */
+.booking-alert {
+    padding: 18px; /* More padding */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    font-size: 0.98em;
+    position: relative;
+    border-left: 5px solid; /* Solid border on the left */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+    .booking-alert i {
+        margin-right: 15px;
+        font-size: 1.4em;
+        flex-shrink: 0;
+    }
+
+.booking-alert-success {
+    background-color: #e6ffe6; /* Lighter green */
+    color: #1a6d2f;
+    border-left-color: #4CAF50;
+}
+
+.booking-alert-error {
+    background-color: #ffe6e6; /* Lighter red */
+    color: #8c2a2a;
+    border-left-color: #E74C3C;
+}
+
+.booking-alert-warning {
+    background-color: #fff8e6; /* Lighter yellow */
+    color: #8f7200;
+    border-left-color: #C59D5F;
+}
+
+.booking-alert-info {
+    background-color: #e6f7ff; /* Lighter blue */
+    color: #0a4f61;
+    border-left-color: #0B3A6A;
+}
+
+.booking-alert-close {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 1.7em;
+    line-height: 1;
+    opacity: 0.6;
+    color: #555;
+}
+
+    .booking-alert-close:hover {
+        opacity: 1;
+        color: #000;
+    }
+
+/* Booking Summary - Egyptian Theme */
+.booking-summary-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 1em;
+    border-bottom: 1px dotted #eee; /* Dotted line for summary */
+}
+
+    .booking-summary-line:last-of-type {
+        border-bottom: none;
+    }
+
+    .booking-summary-line small {
+        color: #777;
+    }
+
+    .booking-summary-line.total {
+        padding-top: 20px;
+        border-top: 2px solid #C59D5F; /* Gold separator for total */
+        font-size: 1.2em;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        margin-top: 15px;
+    }
+
+    .booking-summary-line .text-primary {
+        color: #0B3A6A !important; /* Deep Egyptian Blue for total amount */
+        font-weight: 700;
+    }
+
+    .booking-summary-line .text-success {
+        color: #4CAF50 !important;
+    }
+
+/* Tickets Grid - Egyptian Theme */
+.booking-tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Slightly larger cards */
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.booking-ticket-card {
+    border: 1px solid #f0e6d2; /* Light gold/sandy border */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .booking-ticket-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-ticket-card h6 {
+        font-weight: 700;
+        color: #0B3A6A; /* Deep blue for ticket number */
+        margin-bottom: 8px;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .booking-ticket-card img {
+        max-width: 100%;
+        height: auto;
+        border: 3px solid #C59D5F; /* Gold border for QR code */
+        border-radius: 6px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-ticket-card small {
+        color: #777;
+        margin-bottom: 3px;
+    }
+
+.booking-badge-warning { /* Re-purposing for scanned tickets */
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #0B3A6A;
+    background-color: #F0E6D2; /* Light sandy background */
+    border-radius: 15px;
+    margin-top: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+    .booking-badge-warning i {
+        color: #C59D5F; /* Gold checkmark */
+        margin-right: 5px;
+    }
+
+
+/* Custom styles for ticket status badge - Egyptian Theme */
+.ticket-status-valid {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+}
+
+.ticket-status-scanned {
+    background-color: #C59D5F; /* Gold for scanned */
+    color: #0B3A6A;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+}
+
+/* Media Queries for Responsiveness - Egyptian Theme */
+@media (max-width: 992px) {
+    .booking-main {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .booking-container {
+        padding: 25px;
+    }
+
+    .booking-card-header::after {
+        left: 20px; /* Adjust decorative line position */
+    }
+}
+
+@media (max-width: 768px) {
+    .booking-event-item {
+        flex: 1 1 100%;
+        border-bottom: 1px dashed #eee;
+    }
+
+        .booking-event-item:last-child {
+            border-bottom: none;
+        }
+
+    .booking-tickets-grid {
+        grid-template-columns: 1fr; /* Single column for tickets on very small screens */
+    }
+
+    .booking-header h2 {
+        font-size: 1.4em;
+    }
+
+    .booking-card-header h5, .booking-card-header h6 {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .booking-container {
+        margin: 10px;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+
+        .booking-header h2 {
+            font-size: 1.2em;
+        }
+
+            .booking-header h2 i {
+                font-size: 1.5em;
+            }
+
+        .booking-header > div:last-child {
+            margin-top: 10px;
+        }
+
+    .booking-card-header {
+        padding: 15px 18px;
+    }
+
+    .booking-card-body {
+        padding: 18px;
+    }
+
+    .booking-btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .booking-alert {
+        padding: 15px;
+        font-size: 0.9em;
+    }
+}
+
+/* Optional: Google Fonts Import (add to your main CSS or layout head) */
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap'); */

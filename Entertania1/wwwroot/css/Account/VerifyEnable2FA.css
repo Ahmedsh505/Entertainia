@@ -1,0 +1,90 @@
+﻿/* ============================
+   LIGHT EGYPTIAN THEME + GOLD
+   FULL VERIFY ENABLE 2FA PAGE
+   ============================ */
+
+:root {
+    --color-bg-elevated: #ffffff;
+    --color-text-primary: #0b2235; /* Dark Egyptian Blue (text) */
+    --color-text-secondary: #3b4f61; /* secondary text */
+    --color-accent-start: #C59D3B; /* Gold start */
+    --color-accent-end: #E0B95A; /* Gold end */
+    --gradient-primary: linear-gradient(90deg, var(--color-accent-start), var(--color-accent-end));
+    --radius-md: 12px;
+    --radius-lg: 22px;
+    --shadow-glow: 0 0 12px rgba(241, 196, 15, 0.4);
+}
+
+/* ============================
+   CONTAINER
+   ============================ */
+.container {
+    margin-top: 60px !important;
+}
+
+.card {
+    border-radius: var(--radius-lg);
+    border: 1px solid #e8e8e8;
+}
+
+.card-header {
+    background: var(--gradient-primary) !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    color: #fff !important;
+    padding: 25px !important;
+    text-align: center;
+}
+
+    .card-header h4 {
+        font-weight: 700;
+        margin: 0;
+    }
+
+.card-body {
+    padding: 30px 30px 35px 30px;
+}
+
+/* ============================
+   INPUT
+   ============================ */
+.form-control {
+    border: 2px solid var(--radius-md);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    font-weight: 700;
+    font-size: 22px !important;
+    text-align: center;
+    letter-spacing: 10px !important;
+}
+
+    .form-control:focus {
+        border-color: var(--color-accent-start);
+        box-shadow: var(--shadow-glow);
+    }
+
+/* ============================
+   BUTTON
+   ============================ */
+.btn-primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    padding: 14px !important;
+    font-size: 18px !important;
+    font-weight: 700;
+    border-radius: var(--radius-md) !important;
+    transition: .25s;
+}
+
+    .btn-primary:hover {
+        opacity: .92;
+        transform: translateY(-1px);
+        color: var(--color-text-primary);
+    }
+
+/* ============================
+   FOOT NOTE
+   ============================ */
+.text-muted {
+    color: var(--color-text-primary) !important;
+    font-size: 14px;
+}

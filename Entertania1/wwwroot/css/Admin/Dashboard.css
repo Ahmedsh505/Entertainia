@@ -1,0 +1,189 @@
+﻿:root {
+    --egypt-gold: #D4AF37 !important;
+    --egypt-blue: #0A3D62 !important;
+    --off-white: #F8F5EF !important;
+    --dark-text: #1A1A1A !important;
+    --muted: #6f6f6f !important;
+    --soft-gray: #E6E1D6 !important;
+    --gold-shadow: rgba(212, 175, 55, 0.16) !important;
+}
+
+/* =============================
+   GLOBAL
+============================= */
+body {
+    background: var(--off-white) !important;
+    color: var(--dark-text) !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+h1, h2, h3, h4, h5 {
+    color: var(--egypt-blue) !important;
+}
+
+/* =============================
+   TABS
+============================= */
+.nav-pills .nav-link {
+    color: var(--egypt-blue) !important;
+    font-weight: 600 !important;
+    border-radius: 30px !important;
+}
+
+    .nav-pills .nav-link.active {
+        background-color: var(--egypt-gold) !important;
+        color: var(--dark-text) !important;
+        border: 1px solid var(--egypt-gold) !important;
+        box-shadow: 0 4px 10px var(--gold-shadow) !important;
+        border-radius: 30px !important;
+    }
+
+/* =============================
+   TABLE HEADER
+============================= */
+.table-light th {
+    background-color: var(--soft-gray) !important;
+    color: var(--dark-text) !important;
+    border-bottom: 2px solid var(--egypt-gold) !important;
+}
+
+/* =============================
+   TABLE ROW HOVER
+============================= */
+.table-hover tbody tr:hover {
+    background-color: var(--off-white) !important;
+    box-shadow: inset 0 0 10px var(--gold-shadow) !important;
+}
+
+/* =============================
+   BADGES
+============================= */
+.badge {
+    font-weight: 600 !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+}
+
+    .badge.bg-secondary {
+        background-color: var(--egypt-blue) !important;
+    }
+
+    .badge.bg-info {
+        background-color: var(--egypt-blue) !important;
+        color: #fff !important;
+    }
+
+    .badge.bg-danger {
+        background-color: var(--egypt-blue) !important;
+        color: #fff !important;
+    }
+
+    .badge.bg-success {
+        background-color: #2E7D32 !important;
+    }
+
+    .badge.bg-warning {
+        background-color: var(--egypt-gold) !important;
+        color: black !important;
+    }
+
+/* =============================
+   BUTTONS
+============================= */
+.btn-primary {
+    background-color: var(--egypt-blue) !important;
+    border-color: var(--egypt-blue) !important;
+}
+
+    .btn-primary:hover {
+        background-color: #062941 !important;
+    }
+
+.btn-success {
+    background-color: var(--egypt-gold) !important;
+    border-color: var(--egypt-gold) !important;
+    color: var(--dark-text) !important;
+}
+
+    .btn-success:hover {
+        background-color: #c49c2e !important;
+    }
+
+.btn-danger {
+    background-color: #A30000 !important;
+    border-color: #A30000 !important;
+}
+
+    .btn-danger:hover {
+        background-color: #C60000 !important;
+    }
+
+/* =============================
+   LIVE INDICATOR
+============================= */
+.live-indicator {
+    width: 12px !important;
+    height: 12px !important;
+    background: #FF4500 !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    animation: pulseLive 1s infinite !important;
+}
+
+@keyframes pulseLive {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.3);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* =============================
+   CARD HEADERS
+============================= */
+.card-header {
+    background-color: var(--off-white) !important;
+    border-bottom: 3px solid var(--egypt-gold) !important;
+}
+
+/* =============================
+   MODALS
+============================= */
+.modal-header.bg-danger {
+    background-color: #A30000 !important;
+}
+
+.modal-header.bg-primary {
+    background-color: var(--egypt-blue) !important;
+}
+
+.modal-header.bg-dark {
+    background-color: #000 !important;
+    color: var(--egypt-gold) !important;
+}
+
+#docsContainer .spinner-border {
+    border-top-color: var(--egypt-gold) !important;
+}
+
+#previewContainer {
+    border: 2px solid var(--egypt-gold) !important;
+    background-color: var(--soft-gray) !important;
+}
+
+/* =============================
+   ICONS
+============================= */
+.fa-ticket-alt,
+.fa-building {
+    color: var(--egypt-gold) !important;
+}

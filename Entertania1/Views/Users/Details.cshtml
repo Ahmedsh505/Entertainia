@@ -1,0 +1,69 @@
+﻿@model Core.Models.User
+
+@{
+    ViewData["Title"] = "Details";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/Details.css" />
+}
+<h1>Details</h1>
+
+<div>
+    <h4>User</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            <label asp-for="FirstName" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="FirstName" class="form-control-plaintext">@Model.FirstName</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="LastName" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="LastName" class="form-control-plaintext">@Model.LastName</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="Address" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="Address" class="form-control-plaintext">@Model.Address</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="PhoneNumber" class="form-control-plaintext">@Model.PhoneNumber</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="Email" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="Email" class="form-control-plaintext">@Model.Email</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="UserName" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="UserName" class="form-control-plaintext">@Model.UserName</span>
+        </dd>
+
+        <dt class="col-sm-2">
+            <label asp-for="Role" class="form-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <span asp-for="Role" class="form-control-plaintext">@Model.Role</span>
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

@@ -1,0 +1,21 @@
+﻿@using Core.Models.EventModels
+@model TourismActivity
+
+<div id="tourismactivityfields" class="category-section">
+    <h4>🏝️ Tourism Activity Details</h4>
+
+    <div class="form-group">
+        <label asp-for="GuideName"></label>
+        <input asp-for="GuideName" class="form-control" name="TourismActivity.GuideName" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TourType"></label>
+        <input asp-for="TourType" class="form-control" name="TourismActivity.TourType" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DurationHours"></label>
+        <input asp-for="DurationHours" type="number" class="form-control" name="TourismActivity.DurationHours" />
+    </div>
+</div>

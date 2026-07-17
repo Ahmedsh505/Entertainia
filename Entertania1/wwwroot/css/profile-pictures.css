@@ -1,0 +1,735 @@
+﻿/* ========================================
+   PROFILE PICTURE STYLES
+   Complete CSS for all profile picture displays + Image Cropper
+   FIXED VERSION - Dark Theme Compatible
+   ======================================== */
+
+/* ==================== NAVIGATION BAR ==================== */
+
+/* Profile Picture in Navigation */
+.nav-profile-picture {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #667eea;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+    .nav-profile-picture:hover {
+        transform: scale(1.1);
+    }
+
+/* Initials Avatar in Navigation */
+.nav-profile-initials {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    border: 2px solid #667eea;
+    margin-right: 8px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+    .nav-profile-initials:hover {
+        transform: scale(1.1);
+    }
+
+/* ==================== MY PROFILE PAGE ==================== */
+
+/* Large Profile Picture Display */
+.profile-picture-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.profile-picture-large {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid #667eea;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .profile-picture-large:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+    }
+
+/* Large Initials Placeholder */
+.profile-picture-placeholder-large {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid #667eea;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease;
+}
+
+    .profile-picture-placeholder-large:hover {
+        transform: scale(1.05);
+    }
+
+.initials-text-large {
+    color: white !important;
+    font-size: 5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== EDIT PROFILE PAGE ==================== */
+
+/* Profile Picture Section Container */
+.profile-picture-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+/* Profile Picture Wrapper - CRITICAL FOR SIZE CONSTRAINT */
+.profile-picture-wrapper {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+    /* Profile Picture Preview (Medium Size) - FIXED */
+    .profile-picture-wrapper img,
+    .profile-picture-preview {
+        width: 150px !important;
+        height: 150px !important;
+        max-width: 150px !important;
+        max-height: 150px !important;
+        min-width: 150px !important;
+        min-height: 150px !important;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #667eea;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+        .profile-picture-wrapper img:hover,
+        .profile-picture-preview:hover {
+            transform: scale(1.05);
+        }
+
+/* Profile Picture Container (Legacy Support) */
+.profile-picture-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 180px;
+}
+
+/* Initials Placeholder (Medium Size) */
+.profile-picture-placeholder,
+.profile-initials-placeholder {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 4px solid #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+    .initials-text,
+    .profile-initials-placeholder span {
+        color: white !important;
+        font-size: 3rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+/* Profile Picture Action Buttons - FIXED */
+.profile-picture-actions,
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+    .profile-picture-actions .btn,
+    .profile-actions .btn {
+        padding: 10px 20px !important;
+        font-size: 0.95rem !important;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        min-width: auto;
+    }
+
+    .profile-picture-actions .btn-primary,
+    .profile-actions .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white !important;
+    }
+
+        .profile-picture-actions .btn-primary:hover,
+        .profile-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+    .profile-picture-actions .btn-danger,
+    .profile-actions .btn-danger {
+        background: #dc3545;
+        border: none;
+        color: white !important;
+    }
+
+        .profile-picture-actions .btn-danger:hover,
+        .profile-actions .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+.file-hint {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+}
+
+/* ==================== ADMIN USER LIST ==================== */
+
+/* Small Avatar Circle (Generic) */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    text-transform: uppercase;
+}
+
+/* Small User Avatar Image */
+.user-avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #667eea;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+    .user-avatar-img:hover {
+        transform: scale(1.15);
+    }
+
+/* ==================== IMAGE CROPPER MODAL ==================== */
+
+/* Modal Dark Theme */
+.cropper-modal-content {
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff !important;
+}
+
+.cropper-modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: none;
+    color: white !important;
+}
+
+    .cropper-modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+.cropper-modal-body {
+    background: #1e293b;
+    color: #fff !important;
+}
+
+.cropper-modal-footer {
+    background: #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cropper Container */
+.cropper-container-wrapper {
+    max-height: 400px;
+    overflow: hidden;
+    background-color: #0f172a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cropper Controls */
+.crop-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.crop-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.crop-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+}
+
+.crop-btn-secondary {
+    background-color: #475569;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.crop-btn-danger {
+    background-color: #dc3545;
+    color: white !important;
+}
+
+.crop-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.crop-btn:active {
+    transform: translateY(0);
+}
+
+.crop-btn i {
+    font-size: 16px;
+}
+
+/* Live Preview */
+.crop-preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    flex-direction: column;
+}
+
+.crop-preview-label {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.crop-preview-box {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #667eea;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background-color: #0f172a;
+    position: relative;
+}
+
+#cropPreview {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Cropper.js Customization */
+.cropper-modal {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.cropper-view-box {
+    border: 2px solid #667eea;
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.cropper-face {
+    background-color: transparent !important;
+}
+
+.cropper-line,
+.cropper-point {
+    background-color: #667eea;
+}
+
+    .cropper-point.point-se {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+    }
+
+.cropper-dashed {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.cropper-center {
+    opacity: 1;
+}
+
+/* ==================== EDIT PROFILE CARD STYLES ==================== */
+
+/* Profile Card - Dark Theme */
+.profile-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px;
+}
+
+    .profile-card .card-body {
+        padding: 2rem;
+        background: transparent !important;
+    }
+
+/* Security Card */
+.security-card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px;
+}
+
+    .security-card .card-title {
+        color: #fff !important;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .security-card li {
+        color: rgba(255, 255, 255, 0.8) !important;
+        padding: 0.5rem 0;
+    }
+
+    .security-card i {
+        margin-right: 8px;
+    }
+
+/* Section Divider */
+.section-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 1.5rem 0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+    .form-actions .btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+
+/* Page Header */
+.page-header h1 {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.page-header h4,
+.page-header .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.profile-picture-preview,
+.profile-picture-large,
+.nav-profile-picture,
+.user-avatar-img,
+.profile-picture-wrapper img {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Pulse effect for new uploads */
+.profile-picture-new {
+    animation: pulse 1.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+}
+
+/* Loading state */
+.profile-picture-loading {
+    opacity: 0.5;
+    filter: blur(2px);
+}
+
+/* Cropper loading animation */
+.cropper-loading {
+    position: relative;
+}
+
+    .cropper-loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        margin: -20px 0 0 -20px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error state */
+.profile-picture-error {
+    border-color: #dc3545 !important;
+}
+
+/* Success/Error Messages */
+.crop-message {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.crop-message-success {
+    background-color: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    color: #4ade80 !important;
+}
+
+.crop-message-error {
+    background-color: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #f87171 !important;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 768px) {
+    /* Large profile picture */
+    .profile-picture-large,
+    .profile-picture-placeholder-large {
+        width: 150px;
+        height: 150px;
+    }
+
+    .initials-text-large {
+        font-size: 3.5rem;
+    }
+
+    /* Medium size */
+    .profile-picture-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+
+        .profile-picture-wrapper img,
+        .profile-picture-preview,
+        .profile-picture-placeholder,
+        .profile-initials-placeholder {
+            width: 120px !important;
+            height: 120px !important;
+            max-width: 120px !important;
+            max-height: 120px !important;
+            min-width: 120px !important;
+            min-height: 120px !important;
+        }
+
+            .initials-text,
+            .profile-initials-placeholder span {
+                font-size: 2.5rem;
+            }
+
+    /* Stack profile picture actions */
+    .profile-picture-actions,
+    .profile-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+        .profile-picture-actions .btn,
+        .profile-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+    /* Cropper adjustments */
+    .cropper-container-wrapper {
+        max-height: 300px;
+    }
+
+    .crop-preview-box {
+        width: 120px;
+        height: 120px;
+    }
+
+    .crop-controls {
+        gap: 8px;
+    }
+
+    .crop-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Form actions */
+    .form-actions {
+        flex-direction: column;
+    }
+
+        .form-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+}
+
+@media (max-width: 992px) {
+    .profile-picture-large,
+    .profile-picture-placeholder-large {
+        width: 180px;
+        height: 180px;
+    }
+
+    .initials-text-large {
+        font-size: 4rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .crop-preview-box {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+.profile-picture-preview:focus,
+.nav-profile-picture:focus,
+.user-avatar-img:focus,
+.crop-btn:focus,
+.profile-picture-wrapper img:focus {
+    outline: 3px solid #667eea;
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+    .profile-picture-large,
+    .profile-picture-preview,
+    .nav-profile-picture,
+    .user-avatar-img,
+    .profile-picture-wrapper img {
+        border-color: #000 !important;
+        box-shadow: none !important;
+    }
+
+    .profile-picture-placeholder,
+    .profile-picture-placeholder-large,
+    .nav-profile-initials,
+    .avatar-circle,
+    .profile-initials-placeholder {
+        background: #ccc !important;
+        color: #000 !important;
+    }
+
+    .crop-controls,
+    .crop-preview-container {
+        display: none;
+    }
+}

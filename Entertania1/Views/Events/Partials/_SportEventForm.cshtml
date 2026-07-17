@@ -1,0 +1,26 @@
+﻿@using Core.Models.EventModels
+@model SportEvent
+
+<div id="sporteventfields" class="category-section">
+    <h4>⚽ Sport Event Details</h4>
+
+    <div class="form-group">
+        <label asp-for="SportType"></label>
+        <input asp-for="SportType" class="form-control" name="SportEvent.SportType" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TeamA"></label>
+        <input asp-for="TeamA" class="form-control" name="SportEvent.TeamA" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TeamB"></label>
+        <input asp-for="TeamB" class="form-control" name="SportEvent.TeamB" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LeagueName"></label>
+        <input asp-for="LeagueName" class="form-control" name="SportEvent.LeagueName" />
+    </div>
+</div>

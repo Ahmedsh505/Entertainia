@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Verify 2FA Code";
+}
+
+<link rel="stylesheet" href="~/css/Account/VerifyEnable2FA.css" asp-append-version="true" />
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Verify Code</h4>
+                </div>
+                <div class="card-body">
+                    <p>Enter the 6-digit code we sent to your email.</p>
+
+                    <form asp-action="VerifyEnable2FA" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Verification Code</label>
+                            <input name="code" class="form-control text-center"
+                                   style="font-size: 24px; letter-spacing: 10px;"
+                                   maxlength="6"
+                                   placeholder="000000"
+                                   required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Enable 2FA</button>
+                    </form>
+
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">Code expires in 10 minutes</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

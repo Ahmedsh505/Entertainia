@@ -1,0 +1,462 @@
+﻿/* ===========================
+   SCOPED CSS FOR _Layout.cshtml
+   This overrides Bootstrap defaults with dark theme
+   =========================== */
+
+/* ===========================
+   CRITICAL: Bootstrap Overrides
+   =========================== */
+
+/* Links */
+a {
+    color: #06b6d4 !important;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #a855f7 !important;
+}
+
+/* Buttons */
+.btn-primary {
+    color: #fff !important;
+    background: linear-gradient(135deg, #0a0e27 0%, #6366f1 100%) !important;
+    border: none !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Nav Pills */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    color: #fff !important;
+    background: linear-gradient(135deg, #0a0e27 0%, #6366f1 100%) !important;
+    border: none !important;
+}
+
+/* Borders */
+.border-top {
+    border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+.border-bottom {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Box Shadow */
+.box-shadow {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===========================
+   FORCE ALL TEXT VISIBLE
+   =========================== */
+body,
+.container,
+.container-fluid,
+main,
+p,
+span,
+div,
+label,
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+}
+
+/* ===========================
+   CARD FIXES
+   =========================== */
+.card {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.card-body,
+.card-header,
+.card-footer,
+.card-title,
+.card-text {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* ===========================
+   TABLE FIXES
+   =========================== */
+.table {
+    color: #ffffff !important;
+    background: transparent !important;
+}
+
+.table td,
+.table th {
+    color: #ffffff !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+.table thead th {
+    background: rgba(30, 41, 59, 0.95) !important;
+    color: #ffffff !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background: rgba(30, 41, 59, 0.5) !important;
+    color: #ffffff !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background: rgba(99, 102, 241, 0.1) !important;
+    color: #ffffff !important;
+}
+
+/* ===========================
+   FORM FIXES
+   =========================== */
+.form-control,
+.form-select,
+textarea.form-control,
+input.form-control {
+    background: #1e293b !important;
+    border: 2px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.form-control::placeholder,
+textarea.form-control::placeholder,
+input.form-control::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus,
+input.form-control:focus {
+    background: #1e293b !important;
+    border-color: #06b6d4 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2) !important;
+}
+
+.form-label,
+label {
+    color: #e2e8f0 !important;
+}
+
+.form-check-input {
+    background: #1e293b !important;
+    border: 2px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+.form-check-input:checked {
+    background: linear-gradient(135deg, #0a0e27 0%, #6366f1 100%) !important;
+    border-color: #06b6d4 !important;
+}
+
+.form-check-label {
+    color: #e2e8f0 !important;
+}
+
+/* ===========================
+   ALERT FIXES
+   =========================== */
+.alert {
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-left: 4px solid #22c55e !important;
+    color: #4ade80 !important;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-left: 4px solid #ef4444 !important;
+    color: #f87171 !important;
+}
+
+.alert-info {
+    background: rgba(6, 182, 212, 0.15) !important;
+    border-left: 4px solid #06b6d4 !important;
+    color: #22d3ee !important;
+}
+
+/* ===========================
+   MODAL FIXES
+   =========================== */
+.modal-content {
+    background: #1e293b !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.modal-header,
+.modal-footer {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.modal-body {
+    color: #ffffff !important;
+}
+
+.modal-title {
+    color: #ffffff !important;
+}
+
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* ===========================
+   PAGINATION FIXES
+   =========================== */
+.pagination .page-link {
+    background: #1e293b !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #06b6d4 !important;
+}
+
+.pagination .page-link:hover {
+    background: rgba(99, 102, 241, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #0a0e27 0%, #6366f1 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: rgba(30, 41, 59, 0.5) !important;
+    color: #64748b !important;
+}
+
+/* ===========================
+   BADGE FIXES
+   =========================== */
+.badge {
+    font-weight: 600 !important;
+}
+
+/* Keep badge colors but ensure visibility */
+.badge.bg-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-success {
+    background: #22c55e !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-danger {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-warning {
+    background: #fbbf24 !important;
+    color: #0a0e27 !important;
+}
+
+.badge.bg-info {
+    background: #06b6d4 !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-secondary {
+    background: #64748b !important;
+    color: #ffffff !important;
+}
+
+/* ===========================
+   INPUT GROUP FIXES
+   =========================== */
+.input-group-text {
+    background: #1e293b !important;
+    border: 2px solid rgba(148, 163, 184, 0.2) !important;
+    color: #cbd5e1 !important;
+}
+
+/* ===========================
+   LIST GROUP FIXES
+   =========================== */
+.list-group-item {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.list-group-item:hover {
+    background: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* ===========================
+   BREADCRUMB FIXES
+   =========================== */
+.breadcrumb {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+.breadcrumb-item,
+.breadcrumb-item a {
+    color: #cbd5e1 !important;
+}
+
+.breadcrumb-item.active {
+    color: #ffffff !important;
+}
+
+/* ===========================
+   ACCORDION FIXES
+   =========================== */
+.accordion-item {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.accordion-button {
+    background: rgba(30, 41, 59, 0.95) !important;
+    color: #ffffff !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background: rgba(99, 102, 241, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.accordion-body {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* ===========================
+   PROGRESS BAR FIXES
+   =========================== */
+.progress {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%) !important;
+}
+
+/* ===========================
+   TOAST FIXES
+   =========================== */
+.toast {
+    background: #1e293b !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.toast-header {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.toast-body {
+    color: #ffffff !important;
+}
+
+/* ===========================
+   OVERRIDE BOOTSTRAP LIGHT COLORS
+   =========================== */
+.bg-white {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+.bg-light {
+    background: rgba(30, 41, 59, 0.95) !important;
+}
+
+.text-dark {
+    color: #ffffff !important;
+}
+
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+/* ===========================
+   ENSURE ALL BUTTONS VISIBLE
+   =========================== */
+.btn {
+    color: #ffffff !important;
+}
+
+.btn-secondary {
+    background: #64748b !important;
+    border: none !important;
+}
+
+.btn-secondary:hover {
+    background: #475569 !important;
+}
+
+.btn-success {
+    background: #22c55e !important;
+    border: none !important;
+}
+
+.btn-success:hover {
+    background: #16a34a !important;
+}
+
+.btn-danger {
+    background: #ef4444 !important;
+    border: none !important;
+}
+
+.btn-danger:hover {
+    background: #dc2626 !important;
+}
+
+.btn-warning {
+    background: #fbbf24 !important;
+    border: none !important;
+    color: #0a0e27 !important;
+}
+
+.btn-warning:hover {
+    background: #f59e0b !important;
+    color: #0a0e27 !important;
+}
+
+.btn-info {
+    background: #06b6d4 !important;
+    border: none !important;
+}
+
+.btn-info:hover {
+    background: #0891b2 !important;
+}
+
+/* ===========================
+   STRONG/BOLD TEXT
+   =========================== */
+strong,
+b,
+.fw-bold {
+    color: #ffffff !important;
+}
+
+/* ===========================
+   SMALL TEXT
+   =========================== */
+small,
+.small {
+    color: #cbd5e1 !important;
+}

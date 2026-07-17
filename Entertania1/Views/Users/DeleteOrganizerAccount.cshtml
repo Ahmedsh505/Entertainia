@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Delete Organizer Account";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/DeleteOrganizerAccount.css" />
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3><i class="bi bi-exclamation-triangle"></i> Delete Organizer Account</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="bi bi-info-circle"></i> Important Information</h5>
+                        <ul>
+                            <li>Your account will be <strong>soft-deleted</strong></li>
+                            <li>Your events, tickets, and revenue data will be <strong>preserved</strong></li>
+                            <li>You can <strong>contact admin to restore</strong> your account</li>
+                            <li>Your username will be freed for others to use</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="DeleteOrganizerAccount" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <h5 class="mt-4">Venue Options</h5>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="deleteVenues" id="keepVenues" value="false" checked>
+                                    <label class="form-check-label" for="keepVenues">
+                                        <strong>Keep my venues active</strong>
+                                        <p class="text-muted mb-0">Venues will remain available. New events can be created in them by other organizers if approved by admin.</p>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="deleteVenues" id="deleteVenues" value="true">
+                                    <label class="form-check-label" for="deleteVenues">
+                                        <strong>Delete my venues</strong>
+                                        <p class="text-muted mb-0">Venues will be marked as deleted. Existing events will still reference them, but no new events can be created.</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">What Will Happen?</h5>
+                        <div class="alert alert-info">
+                            <ul class="mb-0">
+                                <li><strong>Preserved:</strong> All your events, bookings, payments, and revenue statistics</li>
+                                <li><strong>Preserved:</strong> Your historical data for platform analytics</li>
+                                <li><strong>Available:</strong> Account restoration through admin approval</li>
+                                <li><strong>Freed:</strong> Your username (can be taken by another user)</li>
+                            </ul>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="MyProfile" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete your account? You can restore it by contacting an admin.')">
+                                <i class="bi bi-trash"></i> Delete My Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

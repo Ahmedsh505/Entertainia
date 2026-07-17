@@ -1,0 +1,676 @@
+﻿@model Entertania1.ViewModels.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/Dashboard.css" />
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fas fa-tasks"></i> Management Dashboard</h2>
+        <div class="d-flex gap-2">
+            <span class="badge bg-warning fs-6">@(Model.PendingOrganizers.Count + Model.PendingVenues.Count + Model.PendingEvents.Count) Pending Approvals</span>
+        </div>
+    </div>
+
+    <!-- ================= MANAGEMENT TABS ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header  border-bottom">
+            <ul class="nav nav-pills nav-fill" id="dashboardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active position-relative" id="organizers-tab" data-bs-toggle="tab" data-bs-target="#organizers" type="button">
+                        <i class="fas fa-user-tie"></i> Organizers
+                        @if (Model.PendingOrganizers.Any())
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                @Model.PendingOrganizers.Count
+                            </span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link position-relative" id="venues-tab" data-bs-toggle="tab" data-bs-target="#venues" type="button">
+                        <i class="fas fa-building"></i> Venues
+                        @if (Model.PendingVenues.Any())
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                @Model.PendingVenues.Count
+                            </span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link position-relative" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button">
+                        <i class="fas fa-calendar-alt"></i> Events
+                        @if (Model.PendingEvents.Any())
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                @Model.PendingEvents.Count
+                            </span>
+                        }
+                    </button>
+                </li>
+               
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="venue-status-tab" data-bs-toggle="tab" data-bs-target="#venueStatus" type="button">
+                        <i class="fas fa-chart-bar"></i> Venue Status
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link position-relative" id="current-events-tab" data-bs-toggle="tab" data-bs-target="#currentEvents" type="button">
+                        <i class="fas fa-clock"></i> Live Events
+                        @if (Model.EventStats.CurrentEvents > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                                @Model.EventStats.CurrentEvents
+                            </span>
+                        }
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body">
+            <div class="tab-content" id="dashboardTabsContent">
+                <!-- ========== ORGANIZERS TAB ========== -->
+                <div class="tab-pane fade show active" id="organizers" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-user-check"></i> Pending Organizer Approvals</h5>
+                        <input type="text" class="form-control w-auto" placeholder="🔍 Search organizers..." id="searchOrganizers">
+                    </div>
+
+                    @if (Model.PendingOrganizers.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Organizer</th>
+                                        <th>Contact Information</th>
+                                        <th>Registration Date</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var org in Model.PendingOrganizers)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-primary text-white me-2">
+                                                        @org.FirstName.Substring(0, 1)@org.LastName.Substring(0, 1)
+                                                    </div>
+                                                    <div>
+                                                        <strong>@org.FirstName @org.LastName</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div><i class="fas fa-envelope text-muted"></i> @org.Email</div>
+                                                <div><i class="fas fa-phone text-muted"></i> @org.PhoneNumber</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">@org.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-info" onclick="viewDocs(@org.Id, '@(org.FirstName + " " + org.LastName)')" title="View Documents">
+                                                        <i class="fas fa-folder-open"></i> Docs
+                                                    </button>
+                                                    <form asp-action="ApproveOrganizer" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@org.Id" />
+                                                        <button class="btn btn-sm btn-success" type="submit" title="Approve">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectOrganizer" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@org.Id" />
+                                                        <button class="btn btn-sm btn-danger" type="submit" title="Reject" onclick="return confirm('Are you sure you want to reject this organizer?')">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success border-0 shadow-sm">
+                            <i class="fas fa-check-circle"></i> All organizer applications have been processed. No pending approvals.
+                        </div>
+                    }
+                </div>
+
+                <!-- ========== VENUES TAB ========== -->
+                <div class="tab-pane fade" id="venues" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-building"></i> Pending Venue Approvals</h5>
+                        <input type="text" class="form-control w-auto" placeholder="🔍 Search venues..." id="searchVenues">
+                    </div>
+
+                    @if (Model.PendingVenues.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Venue Details</th>
+                                        <th>Location</th>
+                                        <th>Capacity</th>
+                                        <th>Created By</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var v in Model.PendingVenues)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-map-marker-alt fa-2x text-primary me-3"></i>
+                                                    <strong>@v.Name</strong>
+                                                </div>
+                                            </td>
+                                            <td><i class="fas fa-location-dot text-muted"></i> @v.Location</td>
+                                            <td><span class="badge bg-info">@v.Capacity guests</span></td>
+                                            <td>@v.CreatedByUser?.FirstName @v.CreatedByUser?.LastName</td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <form asp-action="ApproveVenue" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@v.VenueId" />
+                                                        <button class="btn btn-sm btn-success" type="submit">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectVenue" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@v.VenueId" />
+                                                        <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Are you sure you want to reject this venue?')">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success border-0 shadow-sm">
+                            <i class="fas fa-check-circle"></i> All venue submissions have been processed. No pending approvals.
+                        </div>
+                    }
+                </div>
+
+                <!-- ========== EVENTS TAB ========== -->
+                <div class="tab-pane fade" id="events" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Pending Event Approvals</h5>
+                        <input type="text" class="form-control w-auto" placeholder="🔍 Search events..." id="searchEvents">
+                    </div>
+
+                    @if (Model.PendingEvents.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Category</th>
+                                        <th>Schedule</th>
+                                        <th>Venue</th>
+                                        <th>Organizer</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var e in Model.PendingEvents)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-ticket-alt fa-2x text-warning me-3"></i>
+                                                    <strong>@e.Title</strong>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-secondary">@e.Category</span></td>
+                                            <td>
+                                                <div><i class="fas fa-calendar text-muted"></i> @e.StartDate.ToString("MMM dd, yyyy")</div>
+                                                <small class="text-muted">@e.StartDate.ToString("hh:mm tt")</small>
+                                            </td>
+                                            <td>@e.Venue?.Name</td>
+                                            <td>@e.Organizer?.FirstName @e.Organizer?.LastName</td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <form asp-action="ApproveEvent" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@e.EventId" />
+                                                        <button class="btn btn-sm btn-success" type="submit">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectEvent" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@e.EventId" />
+                                                        <button class="btn btn-sm btn-danger" type="submit" onclick="return confirm('Are you sure you want to reject this event?')">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success border-0 shadow-sm">
+                            <i class="fas fa-check-circle"></i> All event submissions have been processed. No pending approvals.
+                        </div>
+                    }
+                </div>
+
+               
+                <!-- ========== VENUE STATUS TAB ========== -->
+                <div class="tab-pane fade" id="venueStatus" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Venue Occupancy Overview</h5>
+                        <div>
+                            <span class="badge bg-success me-2">Available: @Model.VenueOccupancy.Count(v => !v.IsCurrentlyOccupied)</span>
+                            <span class="badge bg-danger">Occupied: @Model.VenueOccupancy.Count(v => v.IsCurrentlyOccupied)</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Venue</th>
+                                    <th>Location</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Current Event</th>
+                                    <th class="text-center">Total Events</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var venue in Model.VenueOccupancy)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-building fa-2x me-3 @(venue.IsCurrentlyOccupied ? "text-danger" : "text-success")"></i>
+                                                <strong>@venue.VenueName</strong>
+                                            </div>
+                                        </td>
+                                        <td>@venue.Location</td>
+                                        <td><span class="badge bg-info">@venue.Capacity</span></td>
+                                        <td>
+                                            @if (venue.IsCurrentlyOccupied)
+                                            {
+                                                <span class="badge bg-danger"><i class="fas fa-circle-notch fa-spin"></i> Occupied</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Available</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (venue.CurrentEvent != null)
+                                            {
+                                                <div>
+                                                    <strong>@venue.CurrentEvent.Title</strong>
+                                                    <br><small class="text-muted">@venue.CurrentEvent.Category</small>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">No active event</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary rounded-pill">@venue.TotalEventsScheduled</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ========== CURRENT EVENTS TAB ========== -->
+                <div class="tab-pane fade" id="currentEvents" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-broadcast-tower"></i> Live Events</h5>
+                        <span class="badge bg-info fs-6">@Model.EventStats.CurrentEvents Active</span>
+                    </div>
+
+                    @if (Model.EventStats.CurrentEventsList.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Category</th>
+                                        <th>Venue</th>
+                                        <th>Schedule</th>
+                                        <th>Organizer</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var e in Model.EventStats.CurrentEventsList)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="live-indicator me-2"></span>
+                                                    <strong>@e.Title</strong>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-secondary">@e.Category</span></td>
+                                            <td>@e.Venue?.Name</td>
+                                            <td>
+                                                <div><small class="text-muted">Started:</small> @e.StartDate.ToString("MMM dd, hh:mm tt")</div>
+                                                <div><small class="text-muted">Ends:</small> @e.EndDate.ToString("MMM dd, hh:mm tt")</div>
+                                            </td>
+                                            <td>@e.Organizer?.FirstName @e.Organizer?.LastName</td>
+                                            <td class="text-center">
+                                                <a asp-controller="Events" asp-action="Details" asp-route-id="@e.EventId" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info border-0 shadow-sm">
+                            <i class="fas fa-info-circle"></i> No events are currently running.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========== Organizer Docs Modal ========== -->
+<div class="modal fade" id="viewDocsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-folder-open"></i> Documents - <span id="organizerName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="docsContainer" style="min-height:300px;">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Loading documents...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Document Preview Modal ========== -->
+<div class="modal fade" id="docPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fas fa-file-alt"></i> <span id="previewFileName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center bg-light" id="previewContainer" style="min-height:70vh;"></div>
+            <div class="modal-footer">
+                <a id="downloadDocLink" href="#" download class="btn btn-success">
+                    <i class="fas fa-download"></i> Download
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Reject Refund
+        function rejectRefund(id) {
+            document.getElementById('rejectRefundId').value = id;
+            new bootstrap.Modal(document.getElementById('rejectRefundModal')).show();
+        }
+
+        // View Organizer Documents
+        function viewDocs(id, name) {
+            const modal = new bootstrap.Modal(document.getElementById('viewDocsModal'));
+            document.getElementById('organizerName').innerText = name;
+            const container = document.getElementById('docsContainer');
+            container.innerHTML = `<div class='text-center py-5'><div class='spinner-border text-primary'></div><p class='mt-2'>Loading documents...</p></div>`;
+
+            fetch(`/Admin/GetOrganizerDocuments?organizerId=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.length) {
+                        container.innerHTML = `<div class='alert alert-warning'><i class='fas fa-exclamation-triangle'></i> No documents found for this organizer.</div>`;
+                        return;
+                    }
+
+                    let html = '<div class="row g-4">';
+                    data.forEach(doc => {
+                        const ext = doc.fileName.split('.').pop().toLowerCase();
+                        let icon = 'fa-file', color = 'secondary';
+
+                        if (ext === 'pdf') { icon = 'fa-file-pdf'; color = 'danger'; }
+                        else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) { icon = 'fa-file-image'; color = 'success'; }
+                        else if (['doc', 'docx'].includes(ext)) { icon = 'fa-file-word'; color = 'primary'; }
+
+                        html += `
+                            <div class='col-md-4'>
+                                <div class='card h-100 shadow-sm hover-shadow'>
+                                    <div class='card-body text-center'>
+                                        <i class='fas ${icon} fa-3x text-${color} mb-3'></i>
+                                        <h6 class='card-title'>${doc.fileName}</h6>
+                                        <div class='d-grid gap-2 mt-3'>
+                                            <button class='btn btn-outline-primary btn-sm' onclick="previewDocument(${doc.verificationDocId}, '${doc.fileName.replace(/'/g, "\\'")}', '${ext}')">
+                                                <i class='fas fa-eye'></i> Preview
+                                            </button>
+                                            <a href='/Admin/DownloadVerificationFile?docId=${doc.verificationDocId}' class='btn btn-outline-success btn-sm'>
+                                                <i class='fas fa-download'></i> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+                    container.innerHTML = html + '</div>';
+                })
+                .catch(error => {
+                    console.error('Error loading documents:', error);
+                    container.innerHTML = `<div class='alert alert-danger'><i class='fas fa-exclamation-circle'></i> Error loading documents. Please try again.</div>`;
+                });
+
+            modal.show();
+        }
+
+        // Preview Document
+        function previewDocument(id, name, ext) {
+            const modal = new bootstrap.Modal(document.getElementById('docPreviewModal'));
+            document.getElementById('previewFileName').innerText = name;
+            const container = document.getElementById('previewContainer');
+            const url = `/Admin/ViewVerificationFile?docId=${id}`;
+
+            if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                container.innerHTML = `<img src='${url}' class='img-fluid rounded shadow' alt='${name}' style='max-height:70vh;'/>`;
+            } else if (ext === 'pdf') {
+                container.innerHTML = `<iframe src='${url}' class='w-100 rounded' style='height:70vh;border:none;'></iframe>`;
+            } else {
+                container.innerHTML = `<div class='alert alert-info'><i class='fas fa-info-circle'></i> Preview not available for this file type. Please download to view.</div>`;
+            }
+
+            document.getElementById('downloadDocLink').href = `/Admin/DownloadVerificationFile?docId=${id}`;
+            modal.show();
+        }
+
+        // Simple Search Functionality
+        document.getElementById('searchOrganizers')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#organizers tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('searchVenues')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#venues tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('searchEvents')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#events tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('searchRefunds')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#refunds tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Avatar Circle */
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    /* Live Indicator */
+    .live-indicator {
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+
+
+
+    /* Card Hover Effect */
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+    /* Tab Pills Styling */
+    .nav-pills .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        border-radius: 0;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .nav-pills .nav-link:hover {
+            background-color: #f8f9fa;
+            border-bottom-color: #dee2e6;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: transparent;
+            color: #0d6efd;
+            border-bottom-color: #0d6efd;
+        }
+
+    /* Table Row Hover */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+    /* Badge Position */
+    .nav-link .badge {
+        font-size: 0.65rem;
+        padding: 0.25em 0.5em;
+    }
+
+
+
+    /* Alert Styling */
+    .alert {
+        border-left: 4px solid;
+    }
+
+    .alert-success {
+        border-left-color: #198754;
+    }
+
+    .alert-info {
+        border-left-color: #0dcaf0;
+    }
+
+    .alert-warning {
+        border-left-color: #ffc107;
+    }
+
+    .alert-danger {
+        border-left-color: #dc3545;
+    }
+
+    /* Custom Scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+</style>

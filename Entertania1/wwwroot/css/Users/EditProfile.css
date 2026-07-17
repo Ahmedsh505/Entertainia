@@ -1,0 +1,428 @@
+﻿/* ================= ROOT THEME (inherits from global) ================= */
+:root {
+    --gold: #D4AF37;
+    --egypt-blue: #003366;
+    --light-bg: #fdf9f3;
+    --dark-text: #1a1a1a;
+    --border-radius: 12px;
+    --gold-shadow: rgba(212,175,55,0.35);
+}
+
+/* ================= PAGE ================= */
+.edit-profile-container {
+    padding: 20px;
+}
+
+.page-header h1 {
+    color: var(--egypt-blue);
+    font-weight: 800;
+}
+
+.page-header h4 {
+    color: #555;
+}
+
+.section-divider {
+    border-top: 2px solid var(--gold);
+    margin: 25px 0;
+}
+
+/* ================= CARDS ================= */
+.profile-card,
+.security-card {
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    color: var(--egypt-blue);
+}
+
+.security-card .card-title {
+    color: var(--egypt-blue);
+    font-weight: bold;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.security-card ul li {
+    margin-bottom: 10px;
+    color: var(--egypt-blue);
+    font-weight: 600;
+}
+
+.security-card ul li i {
+    margin-right: 8px;
+}
+
+/* ================= PROFILE PICTURE ================= */
+.profile-picture-section {
+    margin-bottom: 20px;
+}
+
+.profile-picture-wrapper {
+    width: 150px;
+    height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--gold);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.profile-picture-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* If initials placeholder appears */
+.profile-initials-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--egypt-blue);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* ================= PROFILE ACTIONS BUTTONS ================= */
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.file-hint {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+    margin-top: 8px;
+}
+
+/* ================= FORM ELEMENTS ================= */
+.form-label {
+    color: var(--egypt-blue);
+    font-weight: 600;
+}
+
+.form-control,
+textarea.form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
+    padding: 10px 14px;
+}
+
+.form-control:focus,
+textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px var(--gold-shadow);
+}
+
+/* ================= ACTION BUTTONS ================= */
+.form-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Primary button */
+.btn-primary {
+    background: linear-gradient(90deg, var(--gold), #e7cc7e);
+    border: none;
+    color: #082235;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    padding: 10px 18px;
+    box-shadow: 0 6px 20px var(--gold-shadow);
+    transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px var(--gold-shadow);
+}
+
+/* Warning button */
+.btn-warning {
+    background-color: #ffc107;
+    color: #222;
+    border-radius: var(--border-radius);
+    border: 2px solid #ffc107;
+}
+
+/* Secondary button */
+.btn-secondary {
+    background-color: #ddd;
+    color: #222;
+    border-radius: var(--border-radius);
+}
+
+/* Danger button */
+.btn-danger {
+    border-radius: var(--border-radius);
+}
+
+/* ================= ALERTS ================= */
+.alert-success {
+    border: 2px solid var(--gold);
+    background-color: #fff8e1;
+    color: var(--dark-text);
+}
+
+.alert-danger {
+    border-radius: var(--border-radius);
+}
+
+/* ================= CROP MODAL ================= */
+.cropper-modal-content {
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.cropper-modal-header {
+    background: var(--egypt-blue);
+    color: #fff;
+    position: relative;
+    z-index: 1050;
+}
+
+.cropper-modal-footer {
+    border-top: 2px solid var(--gold);
+}
+
+.cropper-modal-body {
+    padding: 20px;
+}
+
+/* Fix modal z-index to appear above navbar */
+#cropperModal {
+    z-index: 99999 !important;
+}
+
+#cropperModal .modal-dialog {
+    z-index: 100000 !important;
+}
+
+.modal-backdrop.show {
+    z-index: 99998 !important;
+}
+
+/* Ensure navbar stays below modal */
+.navbar,
+nav {
+    z-index: 1030 !important;
+}
+
+/* CRITICAL: Cropper container wrapper - MUST HAVE HEIGHT */
+.cropper-container-wrapper {
+    width: 100%;
+    height: 500px;
+    max-height: 500px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #2a2a2a;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.cropper-container-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+/* Crop Controls */
+.crop-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.crop-btn,
+.crop-btn-secondary {
+    background: #fff;
+    border: 2px solid var(--gold);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--egypt-blue);
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.crop-btn:hover,
+.crop-btn-secondary:hover {
+    background: var(--gold);
+    color: #082235;
+    transform: translateY(-2px);
+}
+
+/* Live Preview Container */
+.crop-preview-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.crop-preview-label {
+    font-weight: bold;
+    color: var(--egypt-blue);
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Preview Box - CRITICAL FOR CIRCULAR PREVIEW */
+.crop-preview-box {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.crop-preview-box canvas {
+    display: block;
+    width: 150px !important;
+    height: 150px !important;
+    border-radius: 50%;
+}
+
+/* ================= CROPPER.JS LIBRARY OVERRIDES ================= */
+.cropper-container {
+    direction: ltr;
+    font-size: 0;
+    line-height: 0;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    touch-action: none;
+    user-select: none;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+.cropper-container img {
+    display: block;
+    height: 100%;
+    image-orientation: 0deg;
+    max-height: none !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    width: 100%;
+}
+
+.cropper-wrap-box,
+.cropper-canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.cropper-drag-box {
+    background-color: transparent;
+}
+
+/* Cropper view box styling */
+.cropper-view-box {
+    display: block;
+    overflow: hidden;
+    outline: 1px solid var(--gold);
+    outline-color: rgba(212, 175, 55, 0.75);
+}
+
+.cropper-face {
+    background-color: transparent !important;
+}
+
+.cropper-line,
+.cropper-point {
+    background-color: var(--gold);
+}
+
+.cropper-point {
+    height: 8px;
+    opacity: 1;
+    width: 8px;
+}
+
+.cropper-point.point-se {
+    cursor: nwse-resize;
+}
+
+/* ================= LIST COLORS FIX ================= */
+.card ul li {
+    color: var(--egypt-blue);
+    font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .cropper-container-wrapper {
+        height: 350px;
+        max-height: 350px;
+    }
+
+    .crop-preview-box {
+        width: 120px;
+        height: 120px;
+    }
+
+    .crop-preview-box canvas {
+        width: 120px !important;
+        height: 120px !important;
+    }
+
+    .crop-btn,
+    .crop-btn-secondary {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 992px) {
+    .cropper-container-wrapper {
+        height: 550px;
+        max-height: 550px;
+    }
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: .3rem;
+    outline: 0;
+    margin-top: 40px !important;
+}

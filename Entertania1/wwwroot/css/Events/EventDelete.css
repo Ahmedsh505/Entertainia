@@ -1,0 +1,108 @@
+﻿/* ===========================================
+   EVENT DELETE – LIGHT GOLD EGYPTIAN THEME
+   =========================================== */
+
+:root {
+    --gold: #D4AF37;
+    --blue-egyptian: #003366;
+    --light-bg: #fdf9f3;
+    --dark-text: #1a1a1a;
+    --border-radius: 12px;
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+
+/* Headings */
+h2 {
+    color: var(--blue-egyptian);
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h4 {
+    color: var(--dark-text);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+hr {
+    border-top: 2px solid var(--gold);
+}
+
+/* Definition list styles */
+dl.row dt {
+    font-weight: bold;
+    color: var(--blue-egyptian);
+}
+
+dl.row dd {
+    color: #555;
+    margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn-danger {
+    background-color: var(--gold);
+    border: 2px solid var(--gold);
+    color: #fff;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+    .btn-danger:hover {
+        background-color: var(--blue-egyptian);
+        border-color: var(--blue-egyptian);
+        color: #fff;
+    }
+
+.btn-secondary {
+    background-color: #ccc;
+    border: 2px solid #ccc;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+    .btn-secondary:hover {
+        background-color: var(--blue-egyptian);
+        border-color: var(--blue-egyptian);
+        color: #fff;
+    }
+
+.text-muted {
+    color: #777 !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .card {
+        padding: 16px;
+    }
+
+    dl.row dt, dl.row dd {
+        display: block;
+        width: 100%;
+    }
+
+    .btn-danger, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 16px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}

@@ -1,0 +1,489 @@
+﻿@model IEnumerable<Core.Models.User>
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Users Management";
+    var search = ViewBag.Search as string ?? "";
+    var filterValue = ViewBag.FilterValue as string ?? "";
+    var sortColumn = ViewBag.SortColumn as string ?? "";
+    var sortDirection = ViewBag.SortDirection as string ?? "asc";
+    var page = (int)(ViewBag.Page ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var totalUsers = (int)(ViewBag.TotalUsers ?? 0);
+    var isAdmin = User.IsInRole("Admin");
+
+    // Helper function to generate sort link
+    string GetSortUrl(string column)
+    {
+        var newDirection = (sortColumn == column && sortDirection == "asc") ? "desc" : "asc";
+        return $"?search={search}&filterValue={filterValue}&sortColumn={column}&sortDirection={newDirection}&page={page}";
+    }
+
+    // Helper function to get sort icon
+    string GetSortIcon(string column)
+    {
+        if (sortColumn != column) return "⇅";
+        return sortDirection == "asc" ? "↑" : "↓";
+    }
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Users/Index.css" />
+}
+
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Users Management</h2>
+        <span class="badge bg-info text-dark fs-6">Total: @totalUsers users</span>
+    </div>
+    @if (isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-primary mb-3">
+            <i class="fas fa-user-plus"></i> Add New User
+        </a>
+    }
+
+    <!-- 🔍 Search & Filter Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Search Box -->
+                <div class="col-md-5">
+                    <form asp-action="Index" method="get">
+                        <input type="hidden" name="filterValue" value="@filterValue" />
+                        <input type="hidden" name="sortColumn" value="@sortColumn" />
+                        <input type="hidden" name="sortDirection" value="@sortDirection" />
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text"
+                                   name="search"
+                                   value="@search"
+                                   class="form-control"
+                                   placeholder="Search by name, email, or username..." />
+                            <button type="submit" class="btn btn-primary px-4">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Unified Filter -->
+                <div class="col-md-5">
+                    <form asp-action="Index" method="get" class="d-flex gap-2">
+                        <input type="hidden" name="search" value="@search" />
+                        <input type="hidden" name="sortColumn" value="@sortColumn" />
+                        <input type="hidden" name="sortDirection" value="@sortDirection" />
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-filter"></i>
+                            </span>
+                            <select name="filterValue" class="form-select">
+                                <option value="">All Active Users</option>
+
+                                <optgroup label="📋 By Role">
+                                    <option value="Admin" selected="@(filterValue == "Admin")">Admin</option>
+                                    <option value="Organizer" selected="@(filterValue == "Organizer")">Organizer</option>
+                                    <option value="Customer" selected="@(filterValue == "Customer")">Customer</option>
+                                </optgroup>
+
+                                <optgroup label="✓ By Status">
+                                    <option value="Active" selected="@(filterValue == "Active")">Active</option>
+                                    <option value="Rejected" selected="@(filterValue == "Rejected")">Rejected</option>
+                                    <option value="PendingApproval" selected="@(filterValue == "PendingApproval")">Pending Approval</option>
+                                </optgroup>
+
+                                <optgroup label="🗑 Deleted/Banned">
+                                    <option value="Deleted" selected="@(filterValue == "Deleted")">Deleted Users</option>
+                                    <option value="Banned" selected="@(filterValue == "Banned")">Banned Users</option>
+                                </optgroup>
+                            </select>
+                            <button type="submit" class="btn btn-success px-4">
+                                Apply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Clear Filters Button -->
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times-circle"></i> Clear All
+                    </a>
+                </div>
+            </div>
+
+            <!-- Active Filters Display -->
+            @if (!string.IsNullOrEmpty(search) || !string.IsNullOrEmpty(filterValue))
+            {
+                <div class="mt-3">
+                    <small class="text-muted fw-bold">Active filters:</small>
+                    <div class="d-flex gap-2 flex-wrap mt-1">
+                        @if (!string.IsNullOrEmpty(search))
+                        {
+                            <span class="badge bg-primary fs-6">
+                                <i class="fas fa-search me-1"></i> "@search"
+                                <a href="@Url.Action("Index", new { filterValue, sortColumn, sortDirection, page })"
+                                   class="text-white ms-2" style="text-decoration: none; cursor: pointer;">×</a>
+                            </span>
+                        }
+                        @if (!string.IsNullOrEmpty(filterValue))
+                        {
+                            <span class="badge bg-info text-dark fs-6">
+                                <i class="fas fa-filter me-1"></i> @filterValue
+                                <a href="@Url.Action("Index", new { search, sortColumn, sortDirection, page })"
+                                   class="text-dark ms-2" style="text-decoration: none; cursor: pointer;">×</a>
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 🧾 Users Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="cursor: pointer;" onclick="window.location='@GetSortUrl("Name")'">
+                                <i class="fas fa-user me-1"></i> Name @Html.Raw(GetSortIcon("Name"))
+                            </th>
+                            <th style="cursor: pointer;" onclick="window.location='@GetSortUrl("Email")'">
+                                <i class="fas fa-envelope me-1"></i> Email @Html.Raw(GetSortIcon("Email"))
+                            </th>
+                            <th>
+                                <i class="fas fa-at me-1"></i> Username
+                            </th>
+                            <th style="cursor: pointer;" onclick="window.location='@GetSortUrl("Role")'">
+                                <i class="fas fa-user-tag me-1"></i> Role @Html.Raw(GetSortIcon("Role"))
+                            </th>
+                            <th style="cursor: pointer;" onclick="window.location='@GetSortUrl("Status")'">
+                                <i class="fas fa-check-circle me-1"></i> Status @Html.Raw(GetSortIcon("Status"))
+                            </th>
+                            <th>
+                                <i class="fas fa-info-circle me-1"></i> Deletion Type
+                            </th>
+                            <th class="text-center" style="width: 280px;">
+                                <i class="fas fa-cog me-1"></i> Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fas fa-inbox fa-4x mb-3 d-block opacity-50"></i>
+                                    <h5>No users found</h5>
+                                    <p>Try adjusting your search or filter criteria</p>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var u in Model)
+                            {
+                                <tr class="@(u.IsDeleted ? "table-secondary opacity-75" : "")">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle @(u.IsDeleted ? "bg-secondary" : "bg-primary") text-white me-2">
+                                                @((u.FirstName ?? "?").Substring(0, 1).ToUpper())
+                                            </div>
+                                            <strong>@($"{u.FirstName ?? ""} {u.LastName ?? ""}".Trim())</strong>
+                                            @if (u.IsDeleted)
+                                            {
+                                                @if (u.DeletionType == Core.Enums.DeletionType.AdminBanned)
+                                                {
+                                                    <span class="badge bg-danger ms-2">BANNED</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-dark ms-2">Deleted</span>
+                                                }
+                                            }
+                                        </div>
+                                    </td>
+
+                                    <td>@(u.Email ?? "N/A")</td>
+
+                                    <td>
+                                        @if (u.IsDeleted && !string.IsNullOrEmpty(u.OriginalUsername))
+                                        {
+                                            <span class="text-muted">
+                                                @u.OriginalUsername
+                                                <small>(freed)</small>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @u.UserName
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @(u.Role == "Admin" ? "bg-danger" : u.Role == "Organizer" ? "bg-warning text-dark" : "bg-secondary")">
+                                            <i class="fas @(u.Role == "Admin" ? "fa-crown" : u.Role == "Organizer" ? "fa-calendar-alt" : "fa-user") me-1"></i>
+                                            @(u.Role ?? "N/A")
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @(u.AccountStatus == Core.Enums.AccountStatus.Active ? "bg-success" :
+                                                                                                                                                         u.AccountStatus == Core.Enums.AccountStatus.Rejected ? "bg-danger" :
+                                                                                                                                                         u.AccountStatus == Core.Enums.AccountStatus.Disabled ? "bg-secondary" :
+                                                                                                                                                         "bg-warning text-dark")">
+                                    <i class="fas @(u.AccountStatus == Core.Enums.AccountStatus.Active ? "fa-check-circle" :
+                                                                                                                                         u.AccountStatus == Core.Enums.AccountStatus.Rejected ? "fa-times-circle" :
+                                                                                                                                         u.AccountStatus == Core.Enums.AccountStatus.Disabled ? "fa-ban" :
+                                                                                                                                         "fa-clock") me-1"></i>
+                                    @(u.AccountStatus == Core.Enums.AccountStatus.PendingApproval ? "Pending" : u.AccountStatus.ToString())
+                                </span>
+                            </td>
+
+                                    <td>
+                                @if (u.IsDeleted)
+                                        {
+                                            @switch (u.DeletionType)
+                                            {
+                                                case Core.Enums.DeletionType.SelfDeleted:
+                                                    <span class="badge bg-warning text-dark">Self Deleted</span>
+                                                    break;
+                                                case Core.Enums.DeletionType.AdminBanned:
+                                                    <span class="badge bg-danger">Banned</span>
+                                                    break;
+                                                case Core.Enums.DeletionType.AdminDeleted:
+                                                    <span class="badge bg-secondary">Admin Deleted</span>
+                                                    break;
+                                            }
+                                            @if (u.DeletedBy != null)
+                                            {
+                                                <br />
+
+                                                <small class="text-muted">by @u.DeletedBy.UserName</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@u.Id"
+                                               class="btn btn-info btn-sm btn-action" title="View Details">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+
+                                            @if (u.IsDeleted)
+                                            {
+                                                @if (u.DeletionType != Core.Enums.DeletionType.AdminBanned)
+                                                {
+                                                    <form asp-action="Restore" asp-route-id="@u.Id" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-success btn-sm btn-action" title="Restore User"
+                                                                onclick="return confirm('Are you sure you want to restore this user?');">
+                                                            <i class="fas fa-undo"></i> Restore
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Permanently Banned</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@u.Id"
+                                                   class="btn btn-warning btn-sm btn-action" title="Edit User">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+
+                                                <button type="button" class="btn btn-danger btn-sm btn-action"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal@(u.Id)"
+                                                        title="Delete User">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+
+                                                <button type="button" class="btn btn-dark btn-sm btn-action"
+                                                        data-bs-toggle="modal" data-bs-target="#banModal@(u.Id)"
+                                                        title="Ban User">
+                                                    <i class="fas fa-ban"></i> Ban
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal@(u.Id)" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form asp-action="AdminDelete" asp-route-id="@u.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <div class="modal-body">
+                                                    <p>Delete user <strong>@u.FirstName @u.LastName</strong> (@u.Email)?</p>
+                                                    <div class="alert alert-info">
+                                                        <i class="fas fa-info-circle"></i> This action can be reversed later.
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Reason (optional)</label>
+                                                        <textarea name="reason" class="form-control" rows="2"
+                                                          placeholder="Enter reason for deletion..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash"></i> Delete User
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Ban Modal -->
+                                <div class="modal fade" id="banModal@(u.Id)" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-exclamation-triangle"></i> Permanently Ban User
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form asp-action="AdminBan" asp-route-id="@u.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <div class="modal-body">
+                                                    <div class="alert alert-danger">
+                                                        <strong><i class="fas fa-exclamation-triangle"></i> Warning:</strong> This action CANNOT be reversed!
+                                                    </div>
+                                                    <p>Permanently ban user <strong>@u.FirstName @u.LastName</strong> (@u.Email)?</p>
+                                                    <ul class="text-danger">
+                                                        <li>Email will be permanently blacklisted</li>
+                                                        <li>User cannot re-register with this email</li>
+                                                        <li>Account cannot be restored</li>
+                                                        <li>Username will be freed for others</li>
+                                                    </ul>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">Reason (required) <span class="text-danger">*</span></label>
+                                                        <textarea name="reason" class="form-control" rows="3" required
+                                                          placeholder="Enter a detailed reason for banning this user..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-ban"></i> Permanently Ban User
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📄 Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-search="@search"
+                       asp-route-filterValue="@filterValue"
+                       asp-route-sortColumn="@sortColumn"
+                       asp-route-sortDirection="@sortDirection"
+                       asp-route-page="@(page - 1)">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                @{
+                    int startPage = Math.Max(1, page - 2);
+                    int endPage = Math.Min(totalPages, page + 2);
+                }
+
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-search="@search"
+                           asp-route-filterValue="@filterValue"
+                           asp-route-sortColumn="@sortColumn"
+                           asp-route-sortDirection="@sortDirection"
+                           asp-route-page="1">1</a>
+                    </li>
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-search="@search"
+                           asp-route-filterValue="@filterValue"
+                           asp-route-sortColumn="@sortColumn"
+                           asp-route-sortDirection="@sortDirection"
+                           asp-route-page="@i">@i</a>
+                    </li>
+                }
+
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-search="@search"
+                           asp-route-filterValue="@filterValue"
+                           asp-route-sortColumn="@sortColumn"
+                           asp-route-sortDirection="@sortDirection"
+                           asp-route-page="@totalPages">@totalPages</a>
+                    </li>
+                }
+
+                <!-- Next Button -->
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-search="@search"
+                       asp-route-filterValue="@filterValue"
+                       asp-route-sortColumn="@sortColumn"
+                       asp-route-sortDirection="@sortDirection"
+                       asp-route-page="@(page + 1)">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+

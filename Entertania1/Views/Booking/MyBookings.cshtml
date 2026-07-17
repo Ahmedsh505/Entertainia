@@ -1,0 +1,151 @@
+﻿@model IEnumerable<Booking>
+@using Core.Enums
+@using Core.Models.BookingModels
+
+@{
+    ViewData["Title"] = "My Bookings";
+}
+<link rel="stylesheet" href="~/css/Booking/MyBookings.css" />
+
+<div class="mybookings-container">
+    <div class="mybookings-header">
+        <h2 class="mybookings-title"><i class="fas fa-ticket-alt"></i> My Bookings</h2>
+        <p class="mybookings-subtitle">View and manage your event bookings</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="mybookings-alert mybookings-alert-success">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <span class="mybookings-alert-close">&times;</span>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="mybookings-alert mybookings-alert-error">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <span class="mybookings-alert-close">&times;</span>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="mybookings-alert mybookings-alert-info">
+            <i class="fas fa-info-circle"></i> @TempData["Info"]
+            <span class="mybookings-alert-close">&times;</span>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="mybookings-nobooking-card">
+            <i class="fas fa-calendar-times mybookings-nobooking-icon"></i>
+            <h4>No Bookings Yet</h4>
+            <p>You haven't made any bookings yet. Start exploring events!</p>
+            <a asp-controller="Events" asp-action="Index" class="mybookings-btn">Browse Events</a>
+        </div>
+    }
+    else
+    {
+        <div class="mybookings-cards-container">
+            @foreach (var booking in Model.OrderByDescending(b => b.BookingDate))
+            {
+                var currencySymbol = booking.Currency switch
+                {
+                    Currency.EGP => "EGP",
+                    Currency.USD => "$",
+                    Currency.EUR => "€",
+                    _ => "EGP"
+                };
+
+                var statusClass = booking.Status.Replace(" ", "").ToLower(); // confirmed, pendingpayment, etc.
+
+                <div class="mybookings-card">
+                    <div class="mybookings-card-header">
+                        <h6 class="mybookings-card-header-title">
+                            <i class="fas fa-calendar-alt"></i> Booking #@booking.BookingId
+                        </h6>
+                        <span class="mybookings-badge mybookings-badge-@statusClass">
+                            <i class="fas fa-info-circle"></i> @booking.Status
+                        </span>
+                    </div>
+
+                    <div class="mybookings-card-body">
+                        <h5 class="mybookings-card-title">@booking.Event?.Title</h5>
+                        <p class="mybookings-card-venue">@booking.Event?.Venue?.Name</p>
+
+                        <div class="mybookings-card-info">
+                            <div>
+                                <small>Event Date</small>
+                                <strong>@booking.Event?.StartDate.ToString("dd MMM yyyy")</strong>
+                            </div>
+                            <div>
+                                <small>Tickets</small>
+                                <strong>@booking.NumberOfTickets × @booking.TicketTier</strong>
+                            </div>
+                        </div>
+
+                        @if (booking.DiscountAmount > 0)
+                        {
+                            <div class="mybookings-discount">
+                                💰 Saved: @booking.DiscountAmount.ToString("N2") @currencySymbol
+                            </div>
+                        }
+
+                        @if (booking.Status == "Pending Refund")
+                        {
+                            <div class="mybookings-refund-pending">
+                                Refund Requested - Awaiting admin approval.
+                            </div>
+                        }
+
+                        @if (booking.Status == "Refund Rejected")
+                        {
+                            <div class="mybookings-refund-rejected">
+                                Refund Rejected - Booking remains active.
+                            </div>
+                        }
+
+                        @if (booking.Status == "Refunded")
+                        {
+                            <div class="mybookings-refunded">
+                                Refund Completed - 80% refund processed.
+                            </div>
+                        }
+
+                        <div class="mybookings-total">
+                            <div>Subtotal: @booking.TotalPrice.ToString("N2") @currencySymbol</div>
+                            <div>Tax: @booking.TaxAmount.ToString("N2") @currencySymbol</div>
+                            <div>Total: @booking.TotalWithTax.ToString("N2") @currencySymbol</div>
+                        </div>
+                    </div>
+
+                    <div class="mybookings-card-footer">
+                        <a asp-action="Details" asp-route-bookingId="@booking.BookingId" class="mybookings-btn">View Details</a>
+
+                        @if (booking.Status == "PendingPayment")
+                        {
+                            <a asp-action="RetryPayment" asp-route-bookingId="@booking.BookingId" class="mybookings-btn">Pay Now</a>
+                        }
+
+                        @if (booking.Status == "Confirmed" || booking.Status == "Refund Rejected")
+                        {
+                            <a asp-action="Cancel" asp-route-bookingId="@booking.BookingId" class="mybookings-btn">
+                                @(booking.Status == "Refund Rejected" ? "Request Refund Again" : "Request Refund")
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.mybookings-alert-close').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.style.display = 'none');
+        });
+    </script>
+}

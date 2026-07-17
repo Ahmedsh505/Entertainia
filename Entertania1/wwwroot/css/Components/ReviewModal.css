@@ -1,0 +1,616 @@
+﻿/* ============================================
+   REVIEW MODAL POPUP STYLES
+   Modern, Accessible, Beautiful
+   ============================================ */
+
+/* Floating Write Review Button */
+.floating-review-btn-container {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    z-index: 999;
+}
+
+.floating-review-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #C59D3B 0%, #E0B95A 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(197, 157, 59, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pulseButton 2s ease-in-out infinite;
+}
+
+@keyframes pulseButton {
+    0%, 100% {
+        box-shadow: 0 8px 25px rgba(197, 157, 59, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 8px 35px rgba(197, 157, 59, 0.6);
+    }
+}
+
+.floating-review-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(197, 157, 59, 0.6);
+    animation: none;
+}
+
+.floating-review-btn i {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+}
+
+.floating-review-btn:hover i {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.btn-text {
+    font-size: 1rem;
+}
+
+/* Modal Overlay */
+.review-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 34, 53, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+}
+
+    .review-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+/* Modal Container */
+.review-modal {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(11, 34, 53, 0.25);
+    border: 1px solid rgba(197, 157, 59, 0.2);
+    transform: scale(0.9) translateY(50px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.review-modal-overlay.active .review-modal {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Custom Scrollbar */
+.review-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.review-modal::-webkit-scrollbar-track {
+    background: rgba(197, 157, 59, 0.1);
+    border-radius: 10px;
+}
+
+.review-modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #C59D3B, #E0B95A);
+    border-radius: 10px;
+}
+
+/* Modal Header */
+.review-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 30px 35px 25px;
+    border-bottom: 2px solid rgba(197, 157, 59, 0.15);
+    background: linear-gradient(135deg, rgba(197, 157, 59, 0.05) 0%, transparent 100%);
+}
+
+.modal-header-content {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.modal-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C59D3B 0%, #E0B95A 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(197, 157, 59, 0.3);
+    animation: rotateIcon 3s ease-in-out infinite;
+}
+
+@keyframes rotateIcon {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-10deg);
+    }
+
+    75% {
+        transform: rotate(10deg);
+    }
+}
+
+.modal-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--egyptian-blue, #0B3A6A);
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.modal-subtitle {
+    font-size: 0.95rem;
+    color: var(--muted-text, #6f6f6f);
+    margin: 0;
+}
+
+.modal-close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(220, 53, 69, 0.1);
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+    .modal-close-btn:hover {
+        background: #dc3545;
+        color: white;
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+/* Modal Body */
+.review-modal-body {
+    padding: 35px;
+}
+
+/* Form Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark-text, #2a2a2a);
+    margin-bottom: 10px;
+}
+
+    .form-label i {
+        color: var(--gold-dark, #b38c4f);
+        font-size: 1.1rem;
+    }
+
+.required-indicator {
+    color: #dc3545;
+    font-weight: 700;
+}
+
+.optional-indicator {
+    font-size: 0.85rem;
+    color: var(--muted-text, #6f6f6f);
+    font-weight: 500;
+}
+
+/* Form Controls */
+.modal-form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid rgba(197, 157, 59, 0.25);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--dark-text, #2a2a2a);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+    .modal-form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .modal-form-control:focus {
+        outline: none;
+        border-color: var(--gold-dark, #b38c4f);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(197, 157, 59, 0.1);
+    }
+
+.modal-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+/* Character Counter */
+.char-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+    .char-counter i {
+        font-size: 0.9rem;
+    }
+
+/* Rating Section */
+.rating-section {
+    margin: 30px 0;
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(197, 157, 59, 0.05) 0%, rgba(224, 185, 90, 0.05) 100%);
+    border-radius: 16px;
+    border: 2px dashed rgba(197, 157, 59, 0.3);
+}
+
+.rating-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark-text, #2a2a2a);
+    margin-bottom: 20px;
+}
+
+    .rating-label i {
+        color: var(--gold-dark, #b38c4f);
+        font-size: 1.3rem;
+    }
+
+.star-rating-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Star Rating */
+.star-rating-modal {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 12px;
+    justify-content: center;
+}
+
+    .star-rating-modal input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating-modal label {
+        cursor: pointer;
+        font-size: 3.5rem;
+        color: #e0e0e0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+        .star-rating-modal label:hover,
+        .star-rating-modal label:hover ~ label,
+        .star-rating-modal input:checked ~ label {
+            color: var(--gold-dark, #b38c4f);
+            transform: scale(1.15);
+        }
+
+        .star-rating-modal label:active {
+            transform: scale(1.05);
+        }
+
+/* Rating Feedback */
+.rating-feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.rating-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--muted-text, #6f6f6f);
+    transition: all 0.3s ease;
+}
+
+.rating-emojis {
+    display: flex;
+    gap: 12px;
+}
+
+.rating-emoji {
+    font-size: 2rem;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+    filter: grayscale(100%);
+}
+
+    .rating-emoji.active {
+        opacity: 1;
+        filter: grayscale(0%);
+        transform: scale(1.2);
+    }
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid rgba(197, 157, 59, 0.15);
+}
+
+.btn-modal-primary,
+.btn-modal-secondary {
+    flex: 1;
+    padding: 16px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-modal-primary {
+    background: linear-gradient(135deg, #C59D3B 0%, #E0B95A 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(197, 157, 59, 0.3);
+}
+
+    .btn-modal-primary:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(197, 157, 59, 0.45);
+    }
+
+    .btn-modal-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+.btn-modal-secondary {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border: 2px solid rgba(108, 117, 125, 0.2);
+}
+
+    .btn-modal-secondary:hover {
+        background: rgba(108, 117, 125, 0.2);
+        border-color: rgba(108, 117, 125, 0.4);
+        transform: translateY(-2px);
+    }
+
+/* Loading Spinner */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Notification System */
+.review-notification {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: white;
+    padding: 18px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10001;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 350px;
+}
+
+    .review-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .review-notification i {
+        font-size: 1.5rem;
+    }
+
+    .review-notification.success {
+        border-left: 4px solid #22c55e;
+    }
+
+        .review-notification.success i {
+            color: #22c55e;
+        }
+
+    .review-notification.warning {
+        border-left: 4px solid #fbbf24;
+    }
+
+        .review-notification.warning i {
+            color: #fbbf24;
+        }
+
+    .review-notification.info {
+        border-left: 4px solid #06b6d4;
+    }
+
+        .review-notification.info i {
+            color: #06b6d4;
+        }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .floating-review-btn-container {
+        bottom: 80px;
+        right: 20px;
+    }
+
+    .floating-review-btn {
+        padding: 14px 24px;
+        font-size: 0.9rem;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .floating-review-btn i {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .review-modal {
+        border-radius: 20px;
+        max-height: 95vh;
+    }
+
+    .review-modal-header {
+        padding: 25px 20px 20px;
+    }
+
+    .modal-header-content {
+        gap: 15px;
+    }
+
+    .modal-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+        .modal-icon i {
+            font-size: 1.5rem;
+        }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .modal-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .review-modal-body {
+        padding: 25px 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .star-rating-modal label {
+        font-size: 2.5rem;
+        gap: 8px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .review-notification {
+        top: 80px;
+        right: 15px;
+        left: 15px;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .review-modal-overlay {
+        padding: 10px;
+    }
+
+    .star-rating-modal {
+        gap: 8px;
+    }
+
+        .star-rating-modal label {
+            font-size: 2rem;
+        }
+
+    .rating-emoji {
+        font-size: 1.5rem;
+    }
+}

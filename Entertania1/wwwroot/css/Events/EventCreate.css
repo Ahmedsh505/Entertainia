@@ -1,0 +1,271 @@
+﻿/* ==========================
+   Egyptian Luxury Theme
+   ========================== */
+:root {
+    --gold: #D4AF37;
+    --blue-egyptian: #003366;
+    --light-bg: #fdf9f3;
+    --dark-text: #1a1a1a;
+    --border-radius: 12px;
+    --shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ==========================
+   Headings
+   ========================== */
+h2 {
+    color: var(--blue-egyptian);
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* ==========================
+   Card Layout for Sections
+   ========================== */
+.card {
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #fff;
+}
+
+/* Card Headers */
+.card-header {
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-bottom: 2px solid var(--gold);
+    background: var(--gold) !important;
+    color: #fff;
+}
+
+/* ==========================
+   Labels and Inputs
+   ========================== */
+label.form-label {
+    font-weight: bold;
+    color: var(--blue-egyptian);
+}
+
+input.form-control,
+textarea.form-control,
+select.form-control,
+input.form-select {
+    border: 2px solid lightslategray;
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+    input.form-control:focus,
+    textarea.form-control:focus,
+    select.form-control:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(212,175,55,0.3);
+        outline: none;
+    }
+
+/* Input Groups */
+.input-group .form-control {
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.input-group .form-select {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+/* ==========================
+   Concert / Category Section Styling
+   ========================== */
+.category-section {
+    border: 2px solid #D4AF37; /* ذهب */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    background-color: #fff; /* خلفية فاتحة */
+    padding: 20px;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .category-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+    }
+
+    .category-section h4 {
+        color: #003366; /* أزرق مصري */
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #D4AF37;
+        padding-bottom: 5px;
+    }
+
+    /* Form group inside category */
+    .category-section .form-group {
+        margin-bottom: 15px;
+    }
+
+    .category-section label {
+        font-weight: bold;
+        color: #003366;
+    }
+
+    .category-section input.form-control,
+    .category-section select.form-control {
+        border: 2px solid #ccc;
+        border-radius: 12px;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+
+        .category-section input.form-control:focus,
+        .category-section select.form-control:focus {
+            border-color: #D4AF37;
+            box-shadow: 0 0 10px rgba(212,175,55,0.3);
+            outline: none;
+        }
+
+    .category-section span.text-danger {
+        font-size: 0.9rem;
+        margin-top: 3px;
+    }
+
+/* ==========================
+   Buttons
+   ========================== */
+.btn-primary {
+    background-color: #003366; /* Blue Egyptian */
+    border: 2px solid #003366; /* Gold border */
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #fdf9f3; /* Blue Egyptian */
+        color: #003366;
+        border-color: #003366;
+    }
+
+.btn-secondary {
+    background-color: #f5f5f5;
+    border: 2px solid #ccc;
+    color: #333;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-secondary:hover,
+    .btn-secondary:focus {
+        background-color: #003366;
+        border-color: #003366;
+        color: #fff;
+    }
+
+.btn-outline-success {
+    background-color: #fff;
+    border: 2px solid #003366;
+    color: #003366;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-outline-success:hover,
+    .btn-outline-success:focus {
+        background-color: #003366;
+        color: #fff;
+        border-color: #003366;
+    }
+
+/* Optional: small buttons consistent style */
+.btn-sm {
+    border-radius: 8px;
+}
+
+/* Large buttons */
+.btn-lg {
+    border-radius: 12px;
+    font-weight: bold;
+    padding: 12px 25px;
+}
+
+/* ==========================
+   Discount Code Card
+   ========================== */
+.discount-code-item {
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    background-color: #fff8e7;
+    padding: 15px;
+}
+
+/* ==========================
+   Alerts
+   ========================== */
+.alert-info {
+    border-left: 5px solid var(--blue-egyptian);
+    background-color: #e7f1fb;
+    color: var(--dark-text);
+}
+
+.alert-success {
+    border-left: 5px solid var(--gold);
+    background-color: #fff8e7;
+    color: var(--dark-text);
+}
+
+/* ==========================
+   Flatpickr Booked Dates
+   ========================== */
+.booked-date {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+    cursor: not-allowed !important;
+    position: relative;
+}
+
+    .booked-date:hover {
+        background-color: #f5c6cb !important;
+    }
+
+.flatpickr-day.booked-date.today {
+    border-color: #721c24 !important;
+}
+
+.flatpickr-day.selected.booked-date {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+/* ==========================
+   Photo Preview
+   ========================== */
+#photoPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-preview-item {
+    position: relative;
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    width: 120px;
+    height: 120px;
+}
+
+    .photo-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }

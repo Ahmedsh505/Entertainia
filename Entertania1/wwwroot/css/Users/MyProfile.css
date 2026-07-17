@@ -1,0 +1,212 @@
+﻿/* =========================================================
+   GLOBAL THEME VARIABLES
+   (imported from the base theme)
+========================================================= */
+:root {
+    --gold: #D4AF37;
+    --egypt-blue: #003366;
+    --light-bg: #fdf9f3;
+    --dark-text: #1a1a1a;
+    --border-radius: 12px;
+    --gold-shadow: rgba(212,175,55,0.4);
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+    color: var(--egypt-blue);
+    font-weight: 800;
+}
+
+h4 {
+    color: #555;
+}
+
+hr {
+    border-top: 2px solid var(--gold);
+}
+
+/* =========================================================
+   CARDS (GLOBAL)
+========================================================= */
+.card {
+    border: 2px solid var(--gold);
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background-color: var(--egypt-blue) !important;
+    color: #fff !important;
+    font-weight: bold;
+    padding: 12px 18px;
+    border-top-left-radius: var(--border-radius) !important;
+    border-top-right-radius: var(--border-radius) !important;
+}
+
+/* =========================================================
+   PROFILE PICTURE
+========================================================= */
+.profile-picture-large,
+.profile-picture-placeholder-large {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: var(--egypt-blue);
+    color: #fff;
+    font-weight: bold;
+    border: 3px solid var(--gold);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.18);
+}
+.profile-picture-display.mb-3 {
+    text-align: center !important;
+    align-items: center !important;
+}
+.profile-picture-placeholder-large {
+    background: var(--egypt-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.initials-text-large {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+.badge {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    font-weight: bold;
+}
+
+.bg-info {
+    background-color: var(--egypt-blue) !important;
+    color: #fff !important;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+.btn-primary {
+    background: linear-gradient(90deg, var(--gold), #e6c87a);
+    color: #082235 !important;
+    font-weight: bold;
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 6px 20px var(--gold-shadow);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px var(--gold-shadow);
+    }
+
+.btn-warning {
+    background-color: #ffc107 !important;
+    color: #222 !important;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+}
+
+.btn-secondary {
+    background-color: #ccc !important;
+    border-radius: var(--border-radius);
+}
+
+.btn-outline-primary,
+.btn-outline-warning,
+.btn-outline-danger {
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    border: 2px solid var(--gold);
+    color: var(--egypt-blue);
+}
+
+    .btn-outline-primary:hover,
+    .btn-outline-warning:hover,
+    .btn-outline-danger:hover {
+        background: var(--gold);
+        color: #082235;
+    }
+
+/* =========================================================
+   DL ELEMENTS (Personal info)
+========================================================= */
+dl.row dt {
+    font-weight: bold;
+    color: var(--egypt-blue);
+}
+
+dl.row dd {
+    color: #444;
+    padding-bottom: 6px;
+}
+
+/* =========================================================
+   SECURITY CARD + QUICK ACTIONS
+========================================================= */
+.card h5
+ {
+    color:#fff;
+    font-weight: bold;
+}
+.card h6,h3 {
+    color: var(--egypt-blue);
+    font-weight: bold;
+}
+.card p {
+    margin-bottom: 6px;
+    color: var(--egypt-blue);
+}
+/* UL inside role-based portal cards */
+.card.text-white ul {
+    list-style-type: square;
+    color: var(--gold);
+}
+
+/* =========================================================
+   ROLE-BASED PORTAL CARDS
+========================================================= */
+.card.text-white {
+    background: #fff;
+    border: 2px solid var(--gold);
+    
+}
+
+.card.text-white .btn-light {
+    background-color: var(--gold);
+    color: #082235;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+.alert-success {
+    border: 2px solid var(--gold);
+    background-color: #fff8e1;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Extra spacing fix */
+.mt-3 {
+    margin-top: 20px !important;
+}

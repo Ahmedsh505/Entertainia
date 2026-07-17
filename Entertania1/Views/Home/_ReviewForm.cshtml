@@ -1,0 +1,144 @@
+﻿@using System.Security.Claims
+
+<div class="review-form-section" id="reviewFormSection">
+    <div class="container">
+        <div class="review-form-header">
+            <h2 class="review-form-title">Share Your Experience</h2>
+            <p class="review-form-subtitle">We'd love to hear about your experience with Entertania</p>
+        </div>
+
+        <div class="review-form-card">
+            <form asp-action="SubmitReview" asp-controller="Home" method="post" id="reviewForm">
+                @Html.AntiForgeryToken()
+
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <!-- Guest User Fields -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required maxlength="100">
+                                <label for="name">
+                                    <i class="bi bi-person"></i> Your Name *
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required maxlength="100">
+                                <label for="email">
+                                    <i class="bi bi-envelope"></i> Email Address *
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone" maxlength="20">
+                                <label for="phoneNumber">
+                                    <i class="bi bi-telephone"></i> Phone Number (Optional)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Star Rating -->
+                <div class="rating-section">
+                    <label class="rating-label">How would you rate your experience? *</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5" required />
+                        <label for="star5" title="5 stars">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+
+                        <input type="radio" id="star4" name="rating" value="4" />
+                        <label for="star4" title="4 stars">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+
+                        <input type="radio" id="star3" name="rating" value="3" />
+                        <label for="star3" title="3 stars">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+
+                        <input type="radio" id="star2" name="rating" value="2" />
+                        <label for="star2" title="2 stars">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+
+                        <input type="radio" id="star1" name="rating" value="1" />
+                        <label for="star1" title="1 star">
+                            <i class="bi bi-star-fill"></i>
+                        </label>
+                    </div>
+                    <span class="rating-text" id="ratingText">Select a rating</span>
+                </div>
+
+                <!-- Comment -->
+                <div class="form-floating">
+                    <textarea class="form-control" id="comment" name="comment" placeholder="Your review"
+                              style="height: 140px" required maxlength="1000" minlength="10"></textarea>
+                    <label for="comment">
+                        <i class="bi bi-chat-text"></i> Tell us about your experience *
+                    </label>
+                    <div class="char-counter">
+                        <span id="charCount">0</span> / 1000
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit-review">
+                        <i class="bi bi-send"></i>
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Star rating interaction
+        const stars = document.querySelectorAll('.star-rating label');
+        const ratingText = document.getElementById('ratingText');
+        const ratingTexts = ['Terrible', 'Poor', 'Average', 'Good', 'Excellent'];
+
+        document.querySelectorAll('.star-rating input').forEach(input => {
+            input.addEventListener('change', function() {
+                const rating = this.value;
+                ratingText.textContent = ratingTexts[rating - 1];
+                ratingText.style.color = 'var(--gold-dark)';
+            });
+        });
+
+        // Character counter
+        const commentField = document.getElementById('comment');
+        const charCount = document.getElementById('charCount');
+
+        commentField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Form validation
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            const rating = document.querySelector('.star-rating input:checked');
+
+            if (!rating) {
+                e.preventDefault();
+                alert('Please select a rating');
+                return false;
+            }
+
+            const comment = commentField.value.trim();
+            if (comment.length < 10) {
+                e.preventDefault();
+                alert('Comment must be at least 10 characters');
+                return false;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+}
+<link rel="stylesheet" href="~/css/Account/AccessDenied.css" asp-append-version="true" />
+<div class="error-container">
+    <div class="error-background">
+        <div class="error-circle"></div>
+        <div class="error-circle"></div>
+        <div class="error-circle"></div>
+    </div>
+
+    <div class="error-card">
+        <div class="error-header">
+            <div class="error-icon-wrapper">
+                <div class="error-icon-bg">
+                    <i class="error-icon bi bi-shield-exclamation"></i>
+                </div>
+            </div>
+            <h1 class="error-title">Access Denied</h1>
+        </div>
+
+        <div class="error-body">
+            <div class="error-code">403</div>
+            <h2 class="error-message">Permission Required</h2>
+            <p class="error-description">
+                You don't have the necessary permissions to access this page.
+                This area is restricted to authorized users only.
+            </p>
+
+            <div class="error-actions">
+                <a asp-controller="Home" asp-action="Index" class="error-btn error-btn-primary">
+                    <i class="bi bi-house-door"></i> Go to Home
+                </a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                        <button type="submit" class="error-btn error-btn-secondary">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="error-btn error-btn-secondary">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                }
+            </div>
+
+            <div class="error-info">
+                <div class="error-info-title">
+                    <i class="bi bi-info-circle"></i>
+                    What you can do:
+                </div>
+                <ul class="error-info-list">
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Verify that you're logged in with the correct account</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Contact an administrator if you believe you should have access</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Return to the home page and navigate from there</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle"></i>
+                        <span>Check that the URL you entered is correct</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/Acc_access.js" asp-append-version="true"></script>
